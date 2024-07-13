@@ -12,7 +12,7 @@ const Header = ({ toggleTheme, theme }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
       >
-        <h1 className="text-2xl font-bold">Chesko Portfolio</h1>
+        <h1 className="text-2xl font-bold">C_Portfolio</h1>
         <div className="flex space-x-4">
           <Link to="profile" spy={true} smooth={true} duration={500} className="cursor-pointer">Profile</Link>
           <Link to="portfolio" spy={true} smooth={true} duration={500} className="cursor-pointer">Portfolio</Link>

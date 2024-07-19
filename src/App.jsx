@@ -6,7 +6,7 @@ import Footer from './components/Footer';
 import Profile from './components/Profile';
 
 const App = () => {
-  const [theme, setTheme] = useState('light'); // State for theme, default to light
+  const [theme, setTheme] = useState('light'); 
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -14,16 +14,16 @@ const App = () => {
   };
 
   return (
-    <div className='bg-gray-300'>
+    <div className={`min-h-screen ${theme === 'light' ? 'bg-gray-300' : 'bg-gray-900 text-white'}`}>
       <Header />
-      <main>
-        <section id="profile">
+      <main className="container mx-auto px-4">
+        <section id="profile" className="py-8">
           <Profile theme={theme} />
         </section>
-        <section id="portfolio">
+        <section id="portfolio" className="py-8">
           <Portfolio theme={theme} />
         </section>
-        <section id="contact">
+        <section id="contact" className="py-8">
           <Contact />
         </section>
       </main>

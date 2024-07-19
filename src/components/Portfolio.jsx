@@ -24,7 +24,7 @@ const Portfolio = ({ theme }) => {
   ];
 
   return (
-    <section className={`p-4 ${theme === 'dark' ? 'bg-gray-900 text-gray-300' : 'bg-gray-300 text-gray-800'}`}>
+    <section className={`p-4 rounded ${theme === 'dark' ? 'bg-gray-900 text-gray-300' : 'bg-gray-300 text-gray-800'}`}>
       <h2 className="text-4xl font-bold mb-6 text-center">Projects</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.map((project, index) => (

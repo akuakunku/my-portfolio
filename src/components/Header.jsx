@@ -19,11 +19,14 @@ const Header = ({ toggleTheme, theme }) => {
         transition={{ duration: 1 }}
       >
         <h1 className="text-2xl font-bold">C_Portfolio</h1>
-        <div className="hidden md:flex space-x-4">
+        <div className="hidden md:flex items-center space-x-4">
           <Link to="profile" spy={true} smooth={true} duration={500} className="cursor-pointer hover:underline">Profile</Link>
           <Link to="portfolio" spy={true} smooth={true} duration={500} className="cursor-pointer hover:underline">Portfolio</Link>
           <Link to="contact" spy={true} smooth={true} duration={500} className="cursor-pointer hover:underline">Contact</Link>
           <a href="https://github.com/chesko21" className="text-2xl"><FaGithub /></a>
+          <button onClick={toggleTheme} className="text-2xl focus:outline-none">
+            {theme === 'dark' ? '🌞' : '🌜'}
+          </button>
         </div>
         <div className="md:hidden flex items-center space-x-4">
           <button onClick={toggleTheme} className="text-2xl focus:outline-none">
@@ -36,15 +39,20 @@ const Header = ({ toggleTheme, theme }) => {
       </motion.div>
       {menuOpen && (
         <motion.div 
-          className={`md:hidden bg-gray-800 text-white p-4 absolute top-16 right-0 w-48`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
+          className={`md:hidden fixed top-16 right-4 w-48 p-4 rounded-lg shadow-lg ${theme === 'dark' ? 'bg-gray-800 text-dark-text' : 'bg-gray-300 text-gray-900'}`}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
         >
-          <Link to="profile" spy={true} smooth={true} duration={500} className="block py-2 cursor-pointer hover:underline" onClick={handleMenuToggle}>Profile</Link>
-          <Link to="portfolio" spy={true} smooth={true} duration={500} className="block py-2 cursor-pointer hover:underline" onClick={handleMenuToggle}>Portfolio</Link>
-          <Link to="contact" spy={true} smooth={true} duration={500} className="block py-2 cursor-pointer hover:underline" onClick={handleMenuToggle}>Contact</Link>
-          <a href="https://github.com/chesko21" className="block py-2 text-2xl"><FaGithub /></a>
+          <div className="flex flex-col space-y-2">
+            <Link to="profile" spy={true} smooth={true} duration={500} className="block py-2 text-lg cursor-pointer hover:underline" onClick={handleMenuToggle}>Profile</Link>
+            <Link to="portfolio" spy={true} smooth={true} duration={500} className="block py-2 text-lg cursor-pointer hover:underline" onClick={handleMenuToggle}>Portfolio</Link>
+            <Link to="contact" spy={true} smooth={true} duration={500} className="block py-2 text-lg cursor-pointer hover:underline" onClick={handleMenuToggle}>Contact</Link>
+            <a href="https://github.com/chesko21" className="block py-2 text-2xl flex items-center justify-center">
+              <FaGithub />
+            </a>
+          </div>
         </motion.div>
       )}
     </header>

@@ -1,11 +1,19 @@
-module.exports = {
-  purge: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
-  darkMode: 'class', // Atau 'media' atau false untuk nonaktifkan
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'dark-bg': '#111827',
+        'dark-text': '#e2e8f0',
+        'light-bg': '#e2e8f0',
+        'light-text': '#1a202c',
+      },
+    },
   },
-  variants: {
-    extend: {},
-  },
+  darkMode: 'class',
   plugins: [],
-};
+}

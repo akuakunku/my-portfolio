@@ -1,9 +1,13 @@
+// src/App.jsx
 import React, { useState } from 'react';
-import Header from './components/Header';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Layout from './components/Layout';
+import Profile from './components/Profile';
 import Portfolio from './components/Portfolio';
 import Contact from './components/Contact';
-import Footer from './components/Footer';
-import Profile from './components/Profile';
+import BlogHome from './blog/BlogHome';
+import BlogPost from './blog/BlogPost';
+import BlogForm from './blog/BlogForm';
 
 const App = () => {
   const [theme, setTheme] = useState('light');
@@ -15,21 +19,31 @@ const App = () => {
   };
 
   return (
-    <div className={`min-h-screen ${theme === 'light' ? 'bg-light-bg text-light-text' : 'bg-dark-bg text-dark-text'}`}>
-      <Header toggleTheme={toggleTheme} theme={theme} />
-      <main className="container mx-auto px-4">
-        <section id="profile" className="py-8">
-          <Profile theme={theme} />
-        </section>
-        <section id="portfolio" className="py-8">
-          <Portfolio theme={theme} />
-        </section>
-        <section id="contact" className="py-8">
-          <Contact />
-        </section>
-      </main>
-      <Footer />
-    </div>
+    <Router>
+      <Layout toggleTheme={toggleTheme} theme={theme}>
+        <Routes>
+          <Route path="/" element={
+            <>
+              <section id="profile" className="py-8">
+                <Profile theme={theme} />
+              </section>
+              <div className="border-t border-gray-300 dark:border-gray-700 mb-8"></div> 
+              <section id="portfolio" className="py-8">
+                <Portfolio theme={theme} />
+              </section>
+              <div className="border-t border-gray-300 dark:border-gray-700 mb-8"></div> 
+              <section id="contact" className="py-8">
+                <Contact />
+              </section>
+            </>
+          } />
+          <Route path="/blog-home" element={<BlogHome />} />
+          <Route path="/blog-post/:id" element={<BlogPost />} />
+          <Route path="/blog-form" element={<BlogForm />} />
+          <Route path="*" element={<h1>404 - Not Found</h1>} />
+        </Routes>
+      </Layout>
+    </Router>
   );
 };
 

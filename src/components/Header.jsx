@@ -1,6 +1,7 @@
+// src/components/Header.jsx
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { FaGithub, FaBars, FaTimes } from 'react-icons/fa';
-import { Link } from 'react-scroll';
 import { motion } from 'framer-motion';
 
 const Header = ({ toggleTheme, theme }) => {
@@ -20,9 +21,8 @@ const Header = ({ toggleTheme, theme }) => {
       >
         <h1 className="text-2xl font-bold">C_Portfolio</h1>
         <div className="hidden md:flex items-center space-x-4">
-          <Link to="profile" spy={true} smooth={true} duration={500} className="cursor-pointer hover:underline">Profile</Link>
-          <Link to="portfolio" spy={true} smooth={true} duration={500} className="cursor-pointer hover:underline">Portfolio</Link>
-          <Link to="contact" spy={true} smooth={true} duration={500} className="cursor-pointer hover:underline">Contact</Link>
+          <Link to="/" className="cursor-pointer hover:underline">Home</Link>
+          <Link to="/blog-home" className="cursor-pointer hover:underline">Blog's</Link>
           <a href="https://github.com/chesko21" className="text-2xl"><FaGithub /></a>
           <button onClick={toggleTheme} className="text-2xl focus:outline-none">
             {theme === 'dark' ? '🌞' : '🌜'}
@@ -39,16 +39,15 @@ const Header = ({ toggleTheme, theme }) => {
       </motion.div>
       {menuOpen && (
         <motion.div 
-          className={`md:hidden fixed top-16 right-4 w-48 p-4 rounded-lg shadow-lg ${theme === 'dark' ? 'bg-gray-800 text-dark-text' : 'bg-gray-300 text-gray-900'}`}
+          className={`md:hidden fixed top-18 justify-center text-center right-4 w-40 p-4 rounded-lg shadow-lg ${theme === 'dark' ? 'bg-gray-800 text-dark-text' : 'bg-gray-300 text-gray-900'}`}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3 }}
         >
           <div className="flex flex-col space-y-2">
-            <Link to="profile" spy={true} smooth={true} duration={500} className="block py-2 text-lg cursor-pointer hover:underline" onClick={handleMenuToggle}>Profile</Link>
-            <Link to="portfolio" spy={true} smooth={true} duration={500} className="block py-2 text-lg cursor-pointer hover:underline" onClick={handleMenuToggle}>Portfolio</Link>
-            <Link to="contact" spy={true} smooth={true} duration={500} className="block py-2 text-lg cursor-pointer hover:underline" onClick={handleMenuToggle}>Contact</Link>
+            <Link to="/" className="block py-2 text-lg cursor-pointer hover:underline" onClick={handleMenuToggle}>Home</Link>
+            <Link to="/blog-home" className="block py-2 text-lg cursor-pointer hover:underline" onClick={handleMenuToggle}>Blog's</Link>
             <a href="https://github.com/chesko21" className="block py-2 text-2xl flex items-center justify-center">
               <FaGithub />
             </a>

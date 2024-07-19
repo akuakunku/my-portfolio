@@ -5,21 +5,21 @@ const Portfolio = ({ theme }) => {
   const projects = [
     { 
       title: "Resep Masakan Indonesia", 
-      description: "A website that provides various Indonesian recipes.",
+      description: "A website that provides various Indonesian recipes. LINK BROKEN",
       image: "/img/projects1.jpg",
       link: "#"
     },
     { 
-      title: "WiFi Issue Reporting", 
-      description: "A web-based application for reporting WiFi issues.",
+      title: "Form Pendaftaran Wifi", 
+      description: "A web-based application pendaftaran Wifi.",
       image: "/img/projects2.jpg",
       link: "https://heaven-link.vercel.app/"
     },
     { 
-      title: "Project Three", 
-      description: "Description for project three.",
+      title: "web app manajement pembayaran", 
+      description: "web app untuk mendata atau memasukan data client yang sudah membayar wifi bulanan.",
       image: "/img/projects3.jpg",
-      link: "#"
+      link: "https://app-pembayaran-wifi.vercel.app/"
     },
   ];
 

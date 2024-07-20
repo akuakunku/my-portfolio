@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
 import Profile from './components/Profile';
@@ -12,18 +12,22 @@ import AdminLogin from './blog/AdminLogin';
 import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
-    document.documentElement.classList.toggle('dark', newTheme === 'dark');
   };
 
   return (
     <Router>
       <Layout toggleTheme={toggleTheme} theme={theme}>
-        <Routes className="bg-gray-300">
+        <Routes>
           <Route path="/" element={
             <>
               <section id="profile" className="py-4">
@@ -49,7 +53,7 @@ const App = () => {
           <Route path="/blog-home" element={<ProtectedRoute><BlogHome /></ProtectedRoute>} />
           <Route path="/blog-post/:id" element={<BlogPost />} />
           <Route path="/blog-form" element={<BlogForm />} />
-          <Route path="*" element={<h1>404 - Not Found</h1>} />
+         
         </Routes>
       </Layout>
     </Router>

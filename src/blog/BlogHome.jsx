@@ -38,7 +38,7 @@ const BlogHome = () => {
   const cleanContent = (content) => DOMPurify.sanitize(content);
 
   return (
-    <div className="py-8 bg-gray-100 dark:bg-dark-bg">
+    <div className="py-4 bg-gray-300 dark:bg-dark-bg">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-blue-900 dark:text-yellow-500">Blog</h1>
@@ -52,7 +52,7 @@ const BlogHome = () => {
           {posts.map((post) => (
             <motion.div
               key={post.id}
-              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-lg shadow-sm transition-shadow duration-300"
+              className="bg-dark-300 dark:bg-gray-800 border border-gray-700 dark:border-gray-700 p-4 rounded-lg shadow-sm transition-shadow duration-300"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               whileHover={{ scale: 1.05, boxShadow: "0 4px 12px rgba(0,0,0,0.2)" }}
@@ -71,23 +71,25 @@ const BlogHome = () => {
               )}
               <div className="mb-4">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-yellow-500 mb-2 justify-center text-center">{post.title}</h2>
-                <p className="text-gray-700 dark:text-gray-300 mb-4 justify-center text-center" 
-                   dangerouslySetInnerHTML={{ __html: cleanContent(truncateText(post.description, 50)) }}>
+                <p className="text-gray-700 dark:text-gray-300 mb-4 justify-center text-center"
+                  dangerouslySetInnerHTML={{ __html: cleanContent(truncateText(post.description, 50)) }}>
                 </p>
               </div>
               <div className="border-t border-gray-300 dark:border-gray-700 mb-8"></div>
-              <Link to={`/blog-post/${post.id}`} className="text-blue-500 hover:underline dark:text-blue-400">
-                Read more
-              </Link>
+              <div className="flex justify-center">
+                <Link to={`/blog-post/${post.id}`} className="text-blue-500 hover:underline dark:text-blue-400">
+                  Read more
+                </Link>
+              </div>
               <div className="flex justify-between mt-4">
-                <button 
-                  onClick={() => navigate(`/blog-form?id=${post.id}`)} 
+                <button
+                  onClick={() => navigate(`/blog-form?id=${post.id}`)}
                   className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
                 >
                   Edit
                 </button>
-                <button 
-                  onClick={() => handleDelete(post.id)} 
+                <button
+                  onClick={() => handleDelete(post.id)}
                   className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                 >
                   Delete

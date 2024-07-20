@@ -1,5 +1,4 @@
-// src/blog/AdminLogin.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
@@ -10,6 +9,16 @@ const AdminLogin = () => {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuthentication = () => {
+      const isAuthenticated = localStorage.getItem('isAuthenticated');
+      if (isAuthenticated === 'true') {
+        navigate('/blog-home');
+      }
+    };
+    checkAuthentication();
+  }, [navigate]);
 
   const handleLogin = (e) => {
     e.preventDefault();

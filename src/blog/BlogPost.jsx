@@ -32,7 +32,7 @@ const BlogPost = () => {
   const hasBeenEdited = post.updated_at && new Date(post.updated_at).getTime() > new Date(post.created_at).getTime();
 
   return (
-    <div className="relative mt-8 py-4 px-4 max-w-3xl mx-auto bg-white dark:bg-gray-900 rounded-lg shadow-lg">
+    <div className="relative mt-8 py-4 px-4 max-w-3xl mx-auto bg-gray-300 dark:bg-gray-900 rounded-lg shadow-lg">
       <header className="mb-12">
         <motion.div
           initial={{ opacity: 0, y: -20 }}

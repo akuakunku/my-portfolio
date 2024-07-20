@@ -17,6 +17,7 @@ const BlogForm = () => {
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null); 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState('');
 
   const quillRef = useRef(null);
   const quillInstance = useRef(null);
@@ -47,21 +48,86 @@ const BlogForm = () => {
       quillInstance.current = new Quill(quillRef.current, {
         theme: 'snow',
         modules: {
-          toolbar: [
-            [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
-            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-            ['bold', 'italic', 'underline'],
-            ['link', 'image'],
-            [{ 'align': [] }],
-            ['clean']
-          ]
+          toolbar: {
+            container: [
+              [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
+              [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+              ['bold', 'italic', 'underline', 'strike'],
+              [{ 'script': 'sub'}, { 'script': 'super' }],
+              [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+              ['link', 'image'],
+              [{ 'align': [] }],
+              ['clean']
+            ],
+            handlers: {
+              'image': function () {
+                const input = document.createElement('input');
+                input.setAttribute('type', 'file');
+                input.setAttribute('accept', 'image/*');
+                input.click();
+
+                input.onchange = async () => {
+                  const file = input.files[0];
+                  const formData = new FormData();
+                  formData.append('file', file);
+
+                  // Upload file to Supabase storage
+                  const { data, error } = await supabase.storage
+                    .from('blog_posts')
+                    .upload(`images/${Date.now()}-${file.name}`, file);
+
+                  if (error) {
+                    console.error('Error uploading image:', error);
+                    return;
+                  }
+
+                  const imageUrl = `https://wjajpilcrompxkmgjuzp.supabase.co/storage/v1/object/public/blog_posts/images/${Date.now()}-${file.name}`;
+                  const range = quillInstance.current.getSelection();
+                  quillInstance.current.insertEmbed(range.index, 'image', imageUrl);
+                };
+              }
+            }
+          }
         }
       });
 
-      // Event listener for content changes
       quillInstance.current.on('text-change', () => {
         setContent(quillInstance.current.root.innerHTML);
       });
+
+      // Add draggable functionality to the toolbar
+      const toolbar = document.querySelector('.ql-toolbar');
+      let isDragging = false;
+      let startX, startY, initialX, initialY;
+
+      const dragStart = (e) => {
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        initialX = toolbar.offsetLeft;
+        initialY = toolbar.offsetTop;
+        document.addEventListener('mousemove', dragMove);
+        document.addEventListener('mouseup', dragEnd);
+      };
+
+      const dragMove = (e) => {
+        if (isDragging) {
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
+          toolbar.style.left = `${initialX + dx}px`;
+          toolbar.style.top = `${initialY + dy}px`;
+        }
+      };
+
+      const dragEnd = () => {
+        isDragging = false;
+        document.removeEventListener('mousemove', dragMove);
+        document.removeEventListener('mouseup', dragEnd);
+      };
+
+      if (toolbar) {
+        toolbar.addEventListener('mousedown', dragStart);
+      }
     }
   }, []);
 
@@ -77,19 +143,20 @@ const BlogForm = () => {
     e.preventDefault();
     if (isSubmitting) return;
     setIsSubmitting(true);
-    
+
     let imageUrl = imagePreview;
     if (image) {
       const fileExt = image.name.split('.').pop();
       const fileName = `${Date.now()}-${image.name}`;
-      const filePath = `${fileName}`;
-      
-      let { error: uploadError } = await supabase.storage
+      const filePath = `images/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
         .from('blog_posts')
         .upload(filePath, image);
 
       if (uploadError) {
         console.error('Error uploading image:', uploadError);
+        setMessage('Error uploading image. Please try again.');
         setIsSubmitting(false);
         return;
       }
@@ -106,9 +173,11 @@ const BlogForm = () => {
 
     if (error) {
       console.error('Error saving post:', error);
+      setMessage('Error saving post. Please try again.');
       setIsSubmitting(false);
     } else {
-      navigate('/blog-home');
+      setMessage('Post saved successfully!');
+      setTimeout(() => navigate('/blog-home'), 2000);
     }
   };
 
@@ -117,6 +186,7 @@ const BlogForm = () => {
       <h2 className="text-2xl font-bold text-gray-900 dark:text-yellow-500 mb-6">
         {postId ? 'Edit Blog Post' : 'Create a New Blog Post'}
       </h2>
+      {message && <p className={`text-sm ${message.includes('Error') ? 'text-red-500' : 'text-green-500'}`}>{message}</p>}
       <motion.form 
         onSubmit={handleSubmit} 
         className="space-y-4"
@@ -134,7 +204,7 @@ const BlogForm = () => {
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="mt-1 block w-full border dark:text-gray-900 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1 p-2 block w-full border dark:text-gray-900 dark:bg-gray-300 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             required
           />
         </motion.div>
@@ -149,7 +219,7 @@ const BlogForm = () => {
             type="text"
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
-            className="mt-1 block w-full border dark:text-gray-900 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1 p-2 block w-full border dark:text-gray-900 dark:bg-gray-300 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             required
           />
         </motion.div>
@@ -163,7 +233,7 @@ const BlogForm = () => {
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="mt-1 block w-full border dark:text-gray-900 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 resize-y"
+            className="mt-1 p-2 block w-full border dark:text-gray-900 dark:bg-gray-300 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 resize-y"
             required
           />
         </motion.div>
@@ -173,8 +243,10 @@ const BlogForm = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Content</label>
-          <div ref={quillRef} className="w-full h-96 border dark:text-gray-900 border-gray-300 rounded-md" />
+          <label className="block text-sm mb-2 font-medium text-gray-800 dark:text-gray-300">Content</label>
+          <div className="relative">
+            <div ref={quillRef} className="w-full h-96 border dark:text-gray-300 border-gray-300 rounded-md" />
+          </div>
         </motion.div>
 
         <motion.div
@@ -186,10 +258,10 @@ const BlogForm = () => {
           <input
             type="file"
             onChange={handleImageChange}
-            className="mt-1 block w-full border dark:text-gray-900 border-gray-300 rounded-md shadow-sm"
+            className="mt-1 block w-full border dark:text-gray-300 border-gray-300 rounded-md shadow-sm"
           />
           {imagePreview && (
-            <img src={imagePreview} alt="Image preview" className="mt-4 max-w-full h-auto rounded-md shadow-sm" />
+            <img src={imagePreview} alt="Image preview" className="mt-4 w-40 h-auto rounded-md shadow-sm" />
           )}
         </motion.div>
 

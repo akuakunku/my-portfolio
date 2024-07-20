@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import supabase from '../lib/supabaseClient';
 import DOMPurify from 'dompurify';
-import { formatDate } from '../utils/formatDate';
 
 
 // Helper function to truncate text
@@ -14,7 +13,7 @@ const truncateText = (text, maxLength) => {
   return plainText.substring(0, maxLength) + '...';
 };
 
-const PAGE_SIZE = 6; // Number of posts per page
+const PAGE_SIZE = 6;
 
 const BlogList = () => {
   const [posts, setPosts] = useState([]);
@@ -54,7 +53,7 @@ const BlogList = () => {
           {posts.map((post) => (
             <motion.div
               key={post.id}
-              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-lg shadow-lg hover:shadow-2xl transition-transform duration-300"
+              className="bg-gray-400 dark:bg-gray-800 border border-gray-500 dark:border-gray-700 p-4 rounded-lg shadow-lg hover:shadow-2xl transition-transform duration-300"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               whileHover={{ scale: 1.05 }}

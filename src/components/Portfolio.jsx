@@ -30,7 +30,7 @@ const Portfolio = ({ theme }) => {
         {projects.map((project, index) => (
           <motion.div
             key={index}
-            className={`bg-gray-300 p-4 rounded-lg shadow-lg ${theme === 'dark' ? 'dark:bg-gray-800 dark:text-gray-300' : 'light:bg-white light:text-gray-800'}`}
+            className={`bg-gray-400 p-4 rounded-lg shadow-lg ${theme === 'dark' ? 'dark:bg-gray-800 dark:text-gray-300' : 'light:bg-white light:text-gray-800'}`}
             whileHover={{ scale: 1.05, boxShadow: '0 10px 20px rgba(0, 0, 0, 0.15)' }}
             transition={{ type: "spring", stiffness: 300 }}
           >

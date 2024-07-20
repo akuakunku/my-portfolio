@@ -7,10 +7,23 @@ body {
     transition: background-color 0.3s, color 0.3s;
   }
 
-.ql-container {
-  min-height: 400px; 
-}
 
+/* CSS untuk Quill Toolbar */
+.ql-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 90%;
+  z-index: 1000;
+  background-color: #cfc3c3;
+  font-size: small;
+  border-radius: 20px;
+  cursor: move;
+  padding: 10px;
+  justify-content: center;
+  align-content: center;
+  
+}
 .ql-editor {
   min-height: 400px;
 }

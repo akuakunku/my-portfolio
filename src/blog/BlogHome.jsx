@@ -14,19 +14,34 @@ const BlogHome = () => {
       if (error) {
         console.error('Error fetching posts:', error);
       } else {
-       
         setPosts(data);
       }
     };
     fetchPosts();
   }, []);
 
-  const handleDelete = async (id) => {
-    const { error } = await supabase.from('blog_posts').delete().eq('id', id);
-    if (error) {
-      console.error('Error deleting post:', error);
-    } else {
-      setPosts(posts.filter(post => post.id !== id));
+  const handleDelete = async (id, imageUrl) => {
+    try {
+      // Delete the image from Supabase Storage
+      if (imageUrl) {
+        const { data, error: deleteError } = await supabase.storage
+          .from('your-bucket-name')
+          .remove([imageUrl.split('/').pop()]);
+        if (deleteError) {
+          console.error('Error deleting image:', deleteError);
+          return;
+        }
+      }
+
+      // Delete the post from the table
+      const { error } = await supabase.from('blog_posts').delete().eq('id', id);
+      if (error) {
+        console.error('Error deleting post:', error);
+      } else {
+        setPosts(posts.filter(post => post.id !== id));
+      }
+    } catch (error) {
+      console.error('Unexpected error:', error);
     }
   };
 
@@ -89,7 +104,7 @@ const BlogHome = () => {
                   Edit
                 </button>
                 <button
-                  onClick={() => handleDelete(post.id)}
+                  onClick={() => handleDelete(post.id, post.image_url)}
                   className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                 >
                   Delete

@@ -14,7 +14,7 @@ const BlogHome = () => {
       if (error) {
         console.error('Error fetching posts:', error);
       } else {
-        console.log('Fetched posts:', data);
+       
         setPosts(data);
       }
     };

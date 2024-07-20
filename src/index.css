@@ -6,24 +6,33 @@
 body {
     transition: background-color 0.3s, color 0.3s;
   }
-
-
-/* CSS untuk Quill Toolbar */
-.ql-toolbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 90%;
-  z-index: 1000;
-  background-color: #cfc3c3;
-  font-size: small;
-  border-radius: 20px;
-  cursor: move;
-  padding: 10px;
-  justify-content: center;
-  align-content: center;
+  .ql-editor {
+    min-height: 400px;
+  }
   
-}
-.ql-editor {
-  min-height: 400px;
-}
+  .ql-toolbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 52%;
+    z-index: 1000;
+    background-color: #cfc3c3;
+    font-size: small;
+    border-radius: 20px;
+    cursor: move;
+    padding: 10px;
+    display: flex-row;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .ql-toolbar .ql-delete {
+    color: red;
+    cursor: pointer;
+  }
+  
+  .ql-toolbar .ql-delete::before {
+    content: '✘';
+  }
+  

@@ -9,7 +9,7 @@ const BlogForm = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const postId = searchParams.get('id');
-  
+
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [author, setAuthor] = useState('');
@@ -68,22 +68,14 @@ const BlogForm = () => {
 
                 input.onchange = async () => {
                   const file = input.files[0];
-                  const formData = new FormData();
-                  formData.append('file', file);
-
-                  // Upload file to Supabase storage
-                  const { data, error } = await supabase.storage
-                    .from('blog_posts')
-                    .upload(`images/${Date.now()}-${file.name}`, file);
-
-                  if (error) {
-                    console.error('Error uploading image:', error);
-                    return;
-                  }
-
-                  const imageUrl = `https://wjajpilcrompxkmgjuzp.supabase.co/storage/v1/object/public/blog_posts/images/${Date.now()}-${file.name}`;
-                  const range = quillInstance.current.getSelection();
-                  quillInstance.current.insertEmbed(range.index, 'image', imageUrl);
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    const imageUrl = reader.result;
+                    localStorage.setItem(`image-${Date.now()}`, imageUrl);
+                    const range = quillInstance.current.getSelection();
+                    quillInstance.current.insertEmbed(range.index, 'image', imageUrl);
+                  };
+                  reader.readAsDataURL(file);
                 };
               }
             }
@@ -254,7 +246,7 @@ const BlogForm = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.5 }}
         >
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Image</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Image Cover</label>
           <input
             type="file"
             onChange={handleImageChange}

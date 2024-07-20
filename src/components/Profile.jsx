@@ -13,9 +13,9 @@ const Profile = ({ theme }) => {
         />
         <div className="flex-1">
           <h3 className="text-3xl font-bold mb-2">Chesko</h3>
-          <p className="text-lg mb-4">@chesko_one_only</p>
+          <p className="text-lg mb-4">@chesko_oneOnly</p>
           <p className="text-base md:text-lg mb-6 transform transition-transform duration-300 hover:scale-105">
-            I am Chesko, a passionate web developer with a flair for creating dynamic and engaging user experiences. With expertise in JavaScript, Next.js, Vite.js, Tailwind CSS, and PostgreSQL, I bring a modern and efficient approach to web development. My journey is driven by a love for technology and a commitment to continuous learning and innovation.
+            I am Chesko, a passionate web developer with a flair for creating dynamic and engaging user experiences. With expertise in JavaScript, Tailwind CSS, and SQL, I bring a modern and efficient approach to web development. My journey is driven by a love for technology and a commitment to continuous learning and innovation.
           </p>
         </div>
       </div>

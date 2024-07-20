@@ -1,4 +1,3 @@
-// src/components/Header.jsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaGithub, FaBars, FaTimes } from 'react-icons/fa';
@@ -22,7 +21,7 @@ const Header = ({ toggleTheme, theme }) => {
         <h1 className="text-2xl font-bold">C_Portfolio</h1>
         <div className="hidden md:flex items-center space-x-4">
           <Link to="/" className="cursor-pointer hover:underline">Home</Link>
-          <Link to="/blog-home" className="cursor-pointer hover:underline">Blog's</Link>
+          <Link to="/admin-login" className="cursor-pointer hover:underline">Admin Login</Link>
           <a href="https://github.com/chesko21" className="text-2xl"><FaGithub /></a>
           <button onClick={toggleTheme} className="text-2xl focus:outline-none">
             {theme === 'dark' ? '🌞' : '🌜'}
@@ -47,8 +46,8 @@ const Header = ({ toggleTheme, theme }) => {
         >
           <div className="flex flex-col space-y-2">
             <Link to="/" className="block py-2 text-lg cursor-pointer hover:underline" onClick={handleMenuToggle}>Home</Link>
-            <Link to="/blog-home" className="block py-2 text-lg cursor-pointer hover:underline" onClick={handleMenuToggle}>Blog's</Link>
-            <a href="https://github.com/chesko21" className="block py-2 text-2xl flex items-center justify-center">
+            <Link to="/admin-login" className="block py-2 text-lg cursor-pointer hover:underline" onClick={handleMenuToggle}>Admin Login</Link>
+            <a href="https://github.com/chesko21" className="flex py-2 text-2xl items-center justify-center">
               <FaGithub />
             </a>
           </div>

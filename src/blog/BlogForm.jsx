@@ -9,7 +9,7 @@ const BlogForm = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const postId = searchParams.get('id');
-
+  
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [author, setAuthor] = useState('');
@@ -18,10 +18,10 @@ const BlogForm = () => {
   const [imagePreview, setImagePreview] = useState(null); 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
-
+  
   const quillRef = useRef(null);
   const quillInstance = useRef(null);
-
+  
   useEffect(() => {
     if (postId) {
       const fetchPost = async () => {
@@ -59,13 +59,16 @@ const BlogForm = () => {
               [{ 'align': [] }],
               ['clean']
             ],
+            imageResize: {
+              modules: [ 'Resize', 'DisplaySize' ]
+            },
             handlers: {
               'image': function () {
                 const input = document.createElement('input');
                 input.setAttribute('type', 'file');
                 input.setAttribute('accept', 'image/*');
                 input.click();
-
+  
                 input.onchange = async () => {
                   const file = input.files[0];
                   const reader = new FileReader();
@@ -73,6 +76,10 @@ const BlogForm = () => {
                     const imageUrl = reader.result;
                     localStorage.setItem(`image-${Date.now()}`, imageUrl);
                     const range = quillInstance.current.getSelection();
+                    const img = document.createElement('img');
+                    img.src = imageUrl;
+                    img.style.maxWidth = '80%'; 
+                    img.classList.add('resizable-image');
                     quillInstance.current.insertEmbed(range.index, 'image', imageUrl);
                   };
                   reader.readAsDataURL(file);
@@ -82,46 +89,54 @@ const BlogForm = () => {
           }
         }
       });
-
+  
       quillInstance.current.on('text-change', () => {
         setContent(quillInstance.current.root.innerHTML);
       });
-
+  
       // Add draggable functionality to the toolbar
       const toolbar = document.querySelector('.ql-toolbar');
-      let isDragging = false;
-      let startX, startY, initialX, initialY;
-
-      const dragStart = (e) => {
-        isDragging = true;
-        startX = e.clientX;
-        startY = e.clientY;
-        initialX = toolbar.offsetLeft;
-        initialY = toolbar.offsetTop;
-        document.addEventListener('mousemove', dragMove);
-        document.addEventListener('mouseup', dragEnd);
-      };
-
-      const dragMove = (e) => {
-        if (isDragging) {
-          const dx = e.clientX - startX;
-          const dy = e.clientY - startY;
-          toolbar.style.left = `${initialX + dx}px`;
-          toolbar.style.top = `${initialY + dy}px`;
-        }
-      };
-
-      const dragEnd = () => {
-        isDragging = false;
-        document.removeEventListener('mousemove', dragMove);
-        document.removeEventListener('mouseup', dragEnd);
-      };
-
       if (toolbar) {
+        let isDragging = false;
+        let startX, startY, initialX, initialY;
+    
+        const dragStart = (e) => {
+          isDragging = true;
+          startX = e.clientX || e.touches[0].clientX;
+          startY = e.clientY || e.touches[0].clientY;
+          initialX = toolbar.offsetLeft;
+          initialY = toolbar.offsetTop;
+          document.addEventListener('mousemove', dragMove);
+          document.addEventListener('mouseup', dragEnd);
+          document.addEventListener('touchmove', dragMove);
+          document.addEventListener('touchend', dragEnd);
+        };
+    
+        const dragMove = (e) => {
+          if (isDragging) {
+            const clientX = e.clientX || e.touches[0].clientX;
+            const clientY = e.clientY || e.touches[0].clientY;
+            const dx = clientX - startX;
+            const dy = clientY - startY;
+            toolbar.style.left = `${initialX + dx}px`;
+            toolbar.style.top = `${initialY + dy}px`;
+          }
+        };
+    
+        const dragEnd = () => {
+          isDragging = false;
+          document.removeEventListener('mousemove', dragMove);
+          document.removeEventListener('mouseup', dragEnd);
+          document.removeEventListener('touchmove', dragMove);
+          document.removeEventListener('touchend', dragEnd);
+        };
+    
         toolbar.addEventListener('mousedown', dragStart);
+        toolbar.addEventListener('touchstart', dragStart);
       }
     }
   }, []);
+  
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -135,34 +150,36 @@ const BlogForm = () => {
     e.preventDefault();
     if (isSubmitting) return;
     setIsSubmitting(true);
-
+  
+    const content = quillInstance.current.root.innerHTML;
     let imageUrl = imagePreview;
+  
     if (image) {
       const fileExt = image.name.split('.').pop();
       const fileName = `${Date.now()}-${image.name}`;
       const filePath = `images/${fileName}`;
-
+  
       const { error: uploadError } = await supabase.storage
         .from('blog_posts')
         .upload(filePath, image);
-
+  
       if (uploadError) {
         console.error('Error uploading image:', uploadError);
         setMessage('Error uploading image. Please try again.');
         setIsSubmitting(false);
         return;
       }
-
+  
       imageUrl = `https://wjajpilcrompxkmgjuzp.supabase.co/storage/v1/object/public/blog_posts/${filePath}`;
     }
-
+  
     const postPayload = { title, content, author, description };
     if (imageUrl) postPayload.image_url = imageUrl;
-
+  
     const { data, error } = postId 
       ? await supabase.from('blog_posts').update(postPayload).eq('id', postId)
       : await supabase.from('blog_posts').insert([postPayload]);
-
+  
     if (error) {
       console.error('Error saving post:', error);
       setMessage('Error saving post. Please try again.');
@@ -172,6 +189,7 @@ const BlogForm = () => {
       setTimeout(() => navigate('/blog-home'), 2000);
     }
   };
+  
 
   return (
     <div className="relative mt-8 p-6 max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg">
@@ -235,9 +253,9 @@ const BlogForm = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <label className="block text-sm mb-2 font-medium text-gray-800 dark:text-gray-300">Content</label>
+          <label className="block text-sm mb-8 font-medium text-gray-800 dark:text-gray-300">Content</label>
           <div className="relative">
-            <div ref={quillRef} className="w-full h-96 border dark:text-gray-300 border-gray-300 rounded-md" />
+            <div ref={quillRef} className="border dark:text-gray-300 border-gray-300 rounded-md" />
           </div>
         </motion.div>
 

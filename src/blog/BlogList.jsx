@@ -4,13 +4,28 @@ import { motion } from 'framer-motion';
 import supabase from '../lib/supabaseClient';
 import DOMPurify from 'dompurify';
 
-
 // Helper function to truncate text
 const truncateText = (text, maxLength) => {
   if (!text) return '';
   const plainText = text.replace(/<\/?[^>]+>/gi, '');
   if (plainText.length <= maxLength) return plainText;
   return plainText.substring(0, maxLength) + '...';
+};
+
+// Helper function to truncate title
+const truncateTitle = (title, maxLength) => {
+  if (!title) return '';
+  return title.length <= maxLength ? title : title.substring(0, maxLength) + '...';
+};
+
+// Helper function to format date
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
 };
 
 const PAGE_SIZE = 6;
@@ -59,21 +74,26 @@ const BlogList = () => {
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.5 }}
             >
-              {post.image_url && (
-                <motion.img
-                  src={post.image_url}
-                  alt={post.title}
-                  className="w-full h-32 object-cover mb-4 rounded-lg shadow-md"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.5 }}
-                />
-              )}
-              <div className="mb-4 flex flex-col items-center">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-yellow-500 mb-2 text-center">{post.title}</h2>
+              <div className="mb-4">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-yellow-500 mb-2 text-center">
+                  {truncateTitle(post.title, 20)}
+                </h2>
+                <p className="text-gray-700 dark:text-gray-300 mb-2 text-center font-semibold">
+                  <span className="font-semibold">{post.author}</span> | {formatDate(post.created_at)}
+                </p>
+                {post.image_url && (
+                  <motion.img
+                    src={post.image_url}
+                    alt={post.title}
+                    className="w-full h-32 object-cover mb-4 rounded-lg shadow-md"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.5 }}
+                  />
+                )}
                 <p className="text-gray-700 dark:text-gray-300 mb-4 text-center" 
-                   dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(truncateText(post.description, 100)) }}>
+                   dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(truncateText(post.description, 50)) }}>
                 </p>
                 <Link 
                   to={`/blog-post/${post.id}`} 

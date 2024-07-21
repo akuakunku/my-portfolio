@@ -13,20 +13,33 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+  const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem('isAuthenticated') === 'true');
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
     localStorage.setItem('theme', theme);
   }, [theme]);
 
+  useEffect(() => {
+    const checkAuthentication = () => {
+      setIsAuthenticated(localStorage.getItem('isAuthenticated') === 'true');
+    };
+    checkAuthentication();
+  }, []);
+
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('isAuthenticated');
+    setIsAuthenticated(false);
+  };
+
   return (
     <Router>
-      <Layout toggleTheme={toggleTheme} theme={theme}>
+      <Layout toggleTheme={toggleTheme} theme={theme} isAuthenticated={isAuthenticated} handleLogout={handleLogout}>
         <Routes>
           <Route path="/" element={
             <>
@@ -41,19 +54,16 @@ const App = () => {
               <section id="contact" className="py-4">
                 <Contact />
               </section>
-              
               <section id="blog" className="py-4">
                 <BlogList />
               </section>
               <div className="border-t border-gray-300 dark:border-gray-700 mb-4"></div> 
             </>
-            
           } />
-          <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/admin-login" element={<AdminLogin setLoggedIn={setIsAuthenticated} />} />
           <Route path="/blog-home" element={<ProtectedRoute><BlogHome /></ProtectedRoute>} />
           <Route path="/blog-post/:id" element={<BlogPost />} />
           <Route path="/blog-form" element={<BlogForm />} />
-         
         </Routes>
       </Layout>
     </Router>

@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaGithub, FaBars, FaTimes } from 'react-icons/fa';
+import { FaGithub, FaBars, FaTimes, FaSignOutAlt } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
-const Header = ({ toggleTheme, theme }) => {
-  const [menuOpen, setMenuOpen] = useState(false);
+const Header = ({ toggleTheme, theme, isAuthenticated, handleLogout }) => {
+  const [menuOpen, setMenuOpen] = React.useState(false);
 
   const handleMenuToggle = () => {
     setMenuOpen(!menuOpen);
@@ -21,8 +21,13 @@ const Header = ({ toggleTheme, theme }) => {
         <h1 className="text-2xl font-bold">C_Portfolio</h1>
         <div className="hidden md:flex items-center space-x-4">
           <Link to="/" className="cursor-pointer hover:underline">Home</Link>
-          <Link to="/admin-login" className="cursor-pointer hover:underline">Admin Login</Link>
+          <Link to="/admin-login" className="cursor-pointer hover:underline">Admin</Link>
           <a href="https://github.com/chesko21" className="text-2xl"><FaGithub /></a>
+          {isAuthenticated && (
+            <button onClick={handleLogout} className="text-2xl focus:outline-none">
+              <FaSignOutAlt />
+            </button>
+          )}
           <button onClick={toggleTheme} className="text-2xl focus:outline-none">
             {theme === 'dark' ? '🌞' : '🌜'}
           </button>
@@ -45,8 +50,13 @@ const Header = ({ toggleTheme, theme }) => {
           transition={{ duration: 0.3 }}
         >
           <div className="flex flex-col space-y-2">
-            <Link to="/" className="block py-2 text-lg cursor-pointer hover:underline" onClick={handleMenuToggle}>Home</Link>
-            <Link to="/admin-login" className="block py-2 text-lg cursor-pointer hover:underline" onClick={handleMenuToggle}>Admin Login</Link>
+            <Link to="/" className="block py-2 text-sm m-2 cursor-pointer hover:underline" onClick={handleMenuToggle}>Home</Link>
+            <Link to="/admin-login" className="block py-2 text-sm m-2 cursor-pointer hover:underline" onClick={handleMenuToggle}>Admin</Link>
+            {isAuthenticated && (
+              <button onClick={handleLogout} className="flex py-2 text-2xl items-center justify-center">
+             <FaSignOutAlt />
+              </button>
+            )}
             <a href="https://github.com/chesko21" className="flex py-2 text-2xl items-center justify-center">
               <FaGithub />
             </a>

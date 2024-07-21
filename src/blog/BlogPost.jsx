@@ -51,13 +51,14 @@ const BlogPost = () => {
           <div className="border-t border-gray-300 dark:border-gray-700 mb-6"></div>
           {post.image_url && (
             <motion.img
-              src={post.image_url}
-              alt={post.title}
-              className="w-full max-w-md mx-auto h-auto object-cover rounded-lg shadow-md mb-8"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-            />
+  src={post.image_url}
+  alt={post.title}
+  className="responsive-image mx-auto object-cover border border:bg-blue-400 rounded-lg shadow-md mb-8"
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  transition={{ duration: 0.5 }}
+/>
+
           )}
           <p className="text-gray-600 dark:text-gray-300 text-base mb-6">
             {post.description}

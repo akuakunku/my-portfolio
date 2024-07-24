@@ -7,7 +7,7 @@ const Portfolio = ({ theme }) => {
       title: "Resep Masakan Indonesia", 
       description: "A website that provides various Indonesian recipes. LINK BROKEN",
       image: "/img/projects1.jpg",
-      link: "#"
+      link: "http://chesko.wuaze.com/"
     },
     { 
       title: "Form Pendaftaran Wifi", 

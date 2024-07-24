@@ -18,7 +18,7 @@ const Header = ({ toggleTheme, theme, isAuthenticated, handleLogout }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
       >
-        <h1 className="text-2xl font-bold">C_Portfolio</h1>
+        <h1 className="text-2xl font-bold">C_C</h1>
         <div className="hidden md:flex items-center space-x-4">
           <Link to="/" className="cursor-pointer hover:underline">Home</Link>
           <Link to="/admin-login" className="cursor-pointer hover:underline">Admin</Link>

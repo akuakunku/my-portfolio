@@ -5,7 +5,7 @@ const Portfolio = ({ theme }) => {
   const projects = [
     { 
       title: "Resep Masakan Indonesia", 
-      description: "A website that provides various Indonesian recipes. LINK BROKEN",
+      description: "A website that provides various Indonesian recipes.",
       image: "/img/projects1.jpg",
       link: "http://chesko.wuaze.com/"
     },
@@ -20,6 +20,12 @@ const Portfolio = ({ theme }) => {
       description: "Web app untuk mendata atau memasukan data client yang sudah membayar wifi bulanan.",
       image: "/img/projects3.jpg",
       link: "https://app-pembayaran-wifi.vercel.app/"
+    },
+    {
+      title: "Chord Gitar ",
+      description: "web chord gitar .",
+      image: "/img/projects4.jpg",
+      link: "https://chord-gitar.vercel.app/"
     },
   ];
 

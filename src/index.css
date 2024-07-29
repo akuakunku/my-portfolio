@@ -45,6 +45,9 @@ body {
 /* Media query for tablets and small devices */
 @media (max-width: 768px) {
   .ql-toolbar {
+      position: absolute;
+        transition: left 0.1s, top 0.1s;
+        touch-action: none;
     font-size: 12px;
     padding: 4px;
     width: 95%;

@@ -42,23 +42,20 @@ const App = () => {
       <Layout toggleTheme={toggleTheme} theme={theme} isAuthenticated={isAuthenticated} handleLogout={handleLogout}>
         <Routes>
           <Route path="/" element={
-            <>
+            <div className="space-y-8">
               <section id="profile" className="py-4">
                 <Profile theme={theme} />
               </section>
-              <div className="border-t border-gray-300 dark:border-gray-700 mb-4"></div> 
-              <section id="portfolio" className="py-8">
+              <section id="portfolio" className="py-4">
                 <Portfolio theme={theme} />
               </section>
-              <div className="border-t border-gray-300 dark:border-gray-700 mb-4"></div> 
               <section id="contact" className="py-4">
                 <Contact />
               </section>
               <section id="blog" className="py-4">
                 <BlogList />
               </section>
-              <div className="border-t border-gray-300 dark:border-gray-700 mb-4"></div> 
-            </>
+            </div>
           } />
           <Route path="/admin-login" element={<AdminLogin setLoggedIn={setIsAuthenticated} />} />
           <Route path="/blog-home" element={<ProtectedRoute><BlogHome /></ProtectedRoute>} />

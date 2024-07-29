@@ -4,55 +4,67 @@ import { FaThreads } from 'react-icons/fa6';
 
 const Profile = ({ theme }) => {
   return (
-    <section className={`container mx-auto p-4 md:p-8 rounded ${theme === 'dark' ? 'bg-gray-900 text-gray-200' : 'bg-gray-200 text-gray-900'}`}>
+    <section
+      className={`container mx-auto p-4 md:p-8 rounded-lg shadow-lg ${theme === 'dark' ? 'bg-gray-900 text-gray-200' : 'bg-white text-gray-900'}`}
+      aria-label="Profile Section"
+    >
       <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8">
-        <img 
-          src="/img/aku.jpg" 
-          alt="Profile" 
-          className={`rounded-full w-32 h-32 md:w-40 md:h-40 object-cover border-4 border-blue-400 md:border-gray-900 transform transition-transform duration-300 hover:scale-110`}
+        <img
+          src="/img/aku.jpg"
+          alt="Chesko Profile"
+          className={`rounded-full w-32 h-32 md:w-44 md:h-44 object-cover border-4 border-blue-400 md:border-gray-900 shadow-lg transform transition-transform duration-300 hover:scale-110`}
+          aria-label="Profile Image"
         />
-        <div className="flex-1">
-          <h3 className="text-3xl font-bold mb-2">Chesko</h3>
-          <p className="text-lg mb-4">@chesko_oneOnly</p>
-          <p className="text-base md:text-lg mb-6 transform transition-transform duration-300 hover:scale-105">
-            I am Chesko, a passionate web developer with a flair for creating dynamic and engaging user experiences. With expertise in JavaScript, Tailwind CSS, and SQL, I bring a modern and efficient approach to web development. My journey is driven by a love for technology and a commitment to continuous learning and innovation.
+        <div className="flex-1 text-center md:text-left">
+          <h3 className="text-4xl font-extrabold mb-2 transition-transform duration-300 hover:scale-105">
+            Chesko
+          </h3>
+          <p className="text-xl font-medium text-blue-500 mb-4">@chesko_oneOnly</p>
+          <p className="text-base md:text-lg mb-6 leading-relaxed transform transition-transform duration-300 hover:scale-105">
+            As a passionate web developer, I specialize in crafting dynamic user experiences with modern technologies. With expertise in JavaScript, Tailwind CSS, and SQL DATABASE, I am committed to delivering high-quality solutions that not only meet but exceed expectations. Driven by an unwavering dedication to innovation and lifelong learning, I continually seek to transform ideas into impactful digital experiences.
           </p>
         </div>
       </div>
       <div className="flex flex-col items-center mt-8">
-        <h2 className={`text-xl font-bold mb-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-900'}`}>My SOSMED</h2>
-        <div className="flex space-x-4 justify-center">
-          <a 
+        <h2 className={`text-2xl font-semibold mb-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-900'}`}>
+          Connect with Me
+        </h2>
+        <div className="flex space-x-6 justify-center">
+          <a
             href="https://github.com/chesko21"
             target="_blank"
             rel="noopener noreferrer"
-            className={`text-gray-700 hover:text-gray-900 ${theme === 'dark' ? 'dark:text-gray-300' : 'light:text-gray-700'} transform transition-transform duration-300 hover:scale-110`}
+            className={`text-gray-700 hover:text-gray-500 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} transform transition-transform duration-300 hover:scale-110`}
+            aria-label="GitHub Profile"
           >
-            <FaGithub size={28} />
+            <FaGithub size={30} />
           </a>
-          <a 
+          <a
             href="https://www.threads.net/@chesko_afiq"
             target="_blank"
             rel="noopener noreferrer"
-            className={`text-blue-400 hover:text-blue-600 ${theme === 'dark' ? 'dark:text-blue-300' : 'light:text-blue-400'} transform transition-transform duration-300 hover:scale-110`}
+            className={`text-blue-400 hover:text-blue-600 ${theme === 'dark' ? 'text-blue-300' : 'text-blue-400'} transform transition-transform duration-300 hover:scale-110`}
+            aria-label="Threads Profile"
           >
-            <FaThreads size={28} />
+            <FaThreads size={30} />
           </a>
-          <a 
+          <a
             href="https://www.instagram.com/chesko_afiq/"
             target="_blank"
             rel="noopener noreferrer"
-            className={`text-pink-600 hover:text-pink-700 ${theme === 'dark' ? 'dark:text-pink-500' : 'light:text-pink-600'} transform transition-transform duration-300 hover:scale-110`}
+            className={`text-pink-600 hover:text-pink-700 ${theme === 'dark' ? 'text-pink-500' : 'text-pink-600'} transform transition-transform duration-300 hover:scale-110`}
+            aria-label="Instagram Profile"
           >
-            <FaInstagram size={28} />
+            <FaInstagram size={30} />
           </a>
-          <a 
+          <a
             href="https://www.tiktok.com/@afiq_chesko1"
             target="_blank"
             rel="noopener noreferrer"
-            className={`text-black hover:text-gray-800 ${theme === 'dark' ? 'dark:text-gray-300' : 'light:text-black'} transform transition-transform duration-300 hover:scale-110`}
+            className={`text-black hover:text-gray-600 ${theme === 'dark' ? 'text-gray-300' : 'text-black'} transform transition-transform duration-300 hover:scale-110`}
+            aria-label="TikTok Profile"
           >
-            <FaTiktok size={28} />
+            <FaTiktok size={30} />
           </a>
         </div>
       </div>

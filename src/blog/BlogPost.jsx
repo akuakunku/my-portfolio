@@ -25,10 +25,8 @@ const BlogPost = () => {
 
   if (!post) return <p className="text-center text-gray-700 dark:text-gray-300">Loading...</p>;
 
-  // Clean the content to prevent XSS attacks
   const cleanContent = DOMPurify.sanitize(post.content);
 
-  // Check if the post has been updated
   const hasBeenEdited = post.updated_at && new Date(post.updated_at).getTime() > new Date(post.created_at).getTime();
 
   return (
@@ -85,11 +83,7 @@ const BlogPost = () => {
           transition={{ duration: 0.5 }}
         >
           Published on {formatDate(post.created_at)}
-          {hasBeenEdited && (
-            <span className="ml-4">
-              (Last edited on {formatDate(post.updated_at)})
-            </span>
-          )}
+         
         </motion.p>
       </footer>
 

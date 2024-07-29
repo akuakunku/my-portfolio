@@ -9,19 +9,19 @@ const BlogForm = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const postId = searchParams.get('id');
-  
+
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [author, setAuthor] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null); 
+  const [imagePreview, setImagePreview] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
-  
+
   const quillRef = useRef(null);
   const quillInstance = useRef(null);
-  
+
   useEffect(() => {
     if (postId) {
       const fetchPost = async () => {
@@ -53,22 +53,19 @@ const BlogForm = () => {
               [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
               [{ 'list': 'ordered' }, { 'list': 'bullet' }],
               ['bold', 'italic', 'underline', 'strike'],
-              [{ 'script': 'sub'}, { 'script': 'super' }],
+              [{ 'script': 'sub' }, { 'script': 'super' }],
               [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
               ['link', 'image'],
               [{ 'align': [] }],
               ['clean']
             ],
-            imageResize: {
-              modules: [ 'Resize', 'DisplaySize' ]
-            },
             handlers: {
               'image': function () {
                 const input = document.createElement('input');
                 input.setAttribute('type', 'file');
                 input.setAttribute('accept', 'image/*');
                 input.click();
-  
+
                 input.onchange = async () => {
                   const file = input.files[0];
                   const reader = new FileReader();
@@ -78,7 +75,7 @@ const BlogForm = () => {
                     const range = quillInstance.current.getSelection();
                     const img = document.createElement('img');
                     img.src = imageUrl;
-                    img.style.maxWidth = '80%'; 
+                    img.style.maxWidth = '80%';
                     img.classList.add('resizable-image');
                     quillInstance.current.insertEmbed(range.index, 'image', imageUrl);
                   };
@@ -89,17 +86,17 @@ const BlogForm = () => {
           }
         }
       });
-  
+
       quillInstance.current.on('text-change', () => {
         setContent(quillInstance.current.root.innerHTML);
       });
-  
+
       // Add draggable functionality to the toolbar
       const toolbar = document.querySelector('.ql-toolbar');
       if (toolbar) {
         let isDragging = false;
         let startX, startY, initialX, initialY;
-    
+
         const dragStart = (e) => {
           isDragging = true;
           startX = e.clientX || e.touches[0].clientX;
@@ -111,7 +108,7 @@ const BlogForm = () => {
           document.addEventListener('touchmove', dragMove);
           document.addEventListener('touchend', dragEnd);
         };
-    
+
         const dragMove = (e) => {
           if (isDragging) {
             const clientX = e.clientX || e.touches[0].clientX;
@@ -122,7 +119,7 @@ const BlogForm = () => {
             toolbar.style.top = `${initialY + dy}px`;
           }
         };
-    
+
         const dragEnd = () => {
           isDragging = false;
           document.removeEventListener('mousemove', dragMove);
@@ -130,13 +127,12 @@ const BlogForm = () => {
           document.removeEventListener('touchmove', dragMove);
           document.removeEventListener('touchend', dragEnd);
         };
-    
+
         toolbar.addEventListener('mousedown', dragStart);
         toolbar.addEventListener('touchstart', dragStart);
       }
     }
   }, []);
-  
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -150,36 +146,36 @@ const BlogForm = () => {
     e.preventDefault();
     if (isSubmitting) return;
     setIsSubmitting(true);
-  
+
     const content = quillInstance.current.root.innerHTML;
     let imageUrl = imagePreview;
-  
+
     if (image) {
       const fileExt = image.name.split('.').pop();
       const fileName = `${Date.now()}-${image.name}`;
       const filePath = `images/${fileName}`;
-  
+
       const { error: uploadError } = await supabase.storage
         .from('blog_posts')
         .upload(filePath, image);
-  
+
       if (uploadError) {
         console.error('Error uploading image:', uploadError);
         setMessage('Error uploading image. Please try again.');
         setIsSubmitting(false);
         return;
       }
-  
+
       imageUrl = `https://wjajpilcrompxkmgjuzp.supabase.co/storage/v1/object/public/blog_posts/${filePath}`;
     }
-  
+
     const postPayload = { title, content, author, description };
     if (imageUrl) postPayload.image_url = imageUrl;
-  
-    const { data, error } = postId 
+
+    const { data, error } = postId
       ? await supabase.from('blog_posts').update(postPayload).eq('id', postId)
       : await supabase.from('blog_posts').insert([postPayload]);
-  
+
     if (error) {
       console.error('Error saving post:', error);
       setMessage('Error saving post. Please try again.');
@@ -189,7 +185,6 @@ const BlogForm = () => {
       setTimeout(() => navigate('/blog-home'), 2000);
     }
   };
-  
 
   return (
     <div className="relative mt-8 p-6 max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg">
@@ -197,8 +192,8 @@ const BlogForm = () => {
         {postId ? 'Edit Blog Post' : 'Create a New Blog Post'}
       </h2>
       {message && <p className={`text-sm ${message.includes('Error') ? 'text-red-500' : 'text-green-500'}`}>{message}</p>}
-      <motion.form 
-        onSubmit={handleSubmit} 
+      <motion.form
+        onSubmit={handleSubmit}
         className="space-y-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -275,9 +270,9 @@ const BlogForm = () => {
           )}
         </motion.div>
 
-        <motion.button 
-          type="submit" 
-          className={`px-4 py-2 text-white rounded ${isSubmitting ? 'bg-gray-500' : 'bg-blue-500 hover:bg-blue-600'}`} 
+        <motion.button
+          type="submit"
+          className={`px-4 py-2 text-white rounded ${isSubmitting ? 'bg-gray-500' : 'bg-blue-500 hover:bg-blue-600'}`}
           disabled={isSubmitting}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

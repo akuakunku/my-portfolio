@@ -1,23 +1,38 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import supabase from '../lib/supabaseClient';
 import DOMPurify from 'dompurify';
+import { FaPlus, FaEdit, FaTrash, FaCalendarAlt, FaUser, FaChevronUp, FaEye } from 'react-icons/fa';
 
 const BlogHome = () => {
   const [posts, setPosts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const { data, error } = await supabase.from('blog_posts').select('*');
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .order('created_at', { ascending: false });
       if (error) {
         console.error('Error fetching posts:', error);
       } else {
         setPosts(data);
       }
+      setIsLoading(false);
     };
     fetchPosts();
+
+    const handleScroll = () => {
+      setShowScrollTop(window.pageYOffset > 300);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleDelete = async (id, imageUrl) => {
@@ -61,66 +76,146 @@ const BlogHome = () => {
 
   const cleanContent = (content) => DOMPurify.sanitize(content);
 
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
   return (
-    <div className="py-8 bg-gray-100 dark:bg-gray-900 min-h-screen">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-semibold text-gray-900 dark:text-yellow-400">Blog</h1>
+    <motion.div 
+      className="min-h-screen mb-4 p-2 rounded-lg bg-gradient-to-br from-purple-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-900"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="container mx-auto">
+        <motion.div 
+          className="flex flex-col sm:flex-row justify-between items-center py-8"
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+        >
+          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600 mb-4 sm:mb-0">Blog Management</h1>
           <Link to="/blog-form">
-            <button className="px-5 py-2 bg-purple-600 text-white rounded-lg shadow-md hover:bg-purple-700 transition-colors duration-300 text-sm">
-              Create Post
-            </button>
-          </Link>
-        </div>
-        <ul className="space-y-4">
-          {posts.map((post) => (
-            <motion.li
-              key={post.id}
-              className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.3 }}
+            <motion.button
+              whileHover={{ scale: 1.05, boxShadow: "0px 0px 8px rgb(167, 139, 250)" }}
+              whileTap={{ scale: 0.95 }}
+              className="px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg shadow-md transition-all duration-300 text-sm flex items-center"
             >
-              <div className="flex gap-4 items-start">
-                {post.image_url && (
-                  <img
-                    src={post.image_url}
-                    alt={post.title}
-                    className="w-24 h-24 object-cover rounded-md"
-                  />
-                )}
-                <div className="flex-1">
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-yellow-400 mb-2">
-                    {truncateTitle(post.title, 18)}
-                  </h2>
-                  <p className="text-gray-700 dark:text-gray-300 mb-4 text-sm">
-                    {cleanContent(truncateText(post.description, 100))}
-                  </p>
-                  <Link to={`/blog-post/${post.id}`} className="text-blue-500 hover:underline dark:text-blue-400 text-sm">
-                    Read more
-                  </Link>
-                </div>
-              </div>
-              <div className="flex justify-end gap-3 mt-4">
-                <button
-                  onClick={() => navigate(`/blog-form?id=${post.id}`)}
-                  className="px-3 py-1 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors duration-300 text-sm"
+              <FaPlus className="mr-2" /> Create Post
+            </motion.button>
+          </Link>
+        </motion.div>
+        <AnimatePresence>
+          {isLoading ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex justify-center items-center h-64"
+            >
+              <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-32 w-32 animate-spin"></div>
+            </motion.div>
+          ) : (
+            <motion.ul
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              {posts.map((post, index) => (
+                <motion.li
+                  key={post.id}
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -50 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
                 >
-                  Edit
-                </button>
-                <button
-                  onClick={() => confirmDelete(post.id, post.image_url)}
-                  className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-300 text-sm"
-                >
-                  Delete
-                </button>
-              </div>
-            </motion.li>
-          ))}
-        </ul>
+                  <div className="relative pb-2/3 group">
+                    <img
+                      src={post.image_url || 'https://via.placeholder.com/300x200'}
+                      alt={post.title}
+                      className="absolute h-full w-full object-cover transition-transform duration-300 transform group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <Link
+                        to={`/blog-post/${post.id}`}
+                        className="text-white text-lg font-semibold flex items-center"
+                      >
+                        <FaEye className="mr-2" /> View Post
+                      </Link>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <h2 className="text-2xl font-semibold text-gray-900 dark:text-yellow-400 mb-3">
+                      {truncateTitle(post.title, 50)}
+                    </h2>
+                    <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-3">
+                      <FaUser className="mr-2" />
+                      <span className="font-medium">{post.author || 'Anonymous'}</span>
+                      <FaCalendarAlt className="ml-4 mr-2" />
+                      <span>{formatDate(post.created_at)}</span>
+                    </div>
+                    <p className="text-gray-700 dark:text-gray-300 mb-4 text-sm leading-relaxed">
+                      {cleanContent(truncateText(post.description, 20))}
+                    </p>
+                    <div className="flex justify-between items-center mt-4">
+                      <Link
+                        to={`/blog-post/${post.id}`}
+                        className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-200 text-sm font-medium transition-colors duration-300"
+                      >
+                        Read more
+                      </Link>
+                      <div className="flex space-x-2">
+                        <motion.button
+                          whileHover={{ scale: 1.1, rotate: 15 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => navigate(`/blog-form?id=${post.id}`)}
+                          className="p-2 bg-yellow-500 text-white rounded-full hover:bg-yellow-600 transition-colors duration-300"
+                        >
+                          <FaEdit />
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.1, rotate: -15 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => confirmDelete(post.id, post.image_url)}
+                          className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-300"
+                        >
+                          <FaTrash />
+                        </motion.button>
+                      </div>
+                    </div>
+                  </div>
+                </motion.li>
+              ))}
+            </motion.ul>
+          )}
+        </AnimatePresence>
       </div>
-    </div>
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            className="fixed bottom-8 right-8 p-4 bg-purple-600 text-white rounded-full shadow-lg"
+            onClick={scrollToTop}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <FaChevronUp />
+          </motion.button>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 

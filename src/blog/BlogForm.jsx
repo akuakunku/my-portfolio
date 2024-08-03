@@ -42,7 +42,6 @@ const BlogForm = () => {
       fetchPost();
     }
   }, [postId]);
-
   useEffect(() => {
     if (!quillInstance.current) {
       quillInstance.current = new Quill(quillRef.current, {
@@ -50,11 +49,9 @@ const BlogForm = () => {
         modules: {
           toolbar: {
             container: [
-              [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
+              [{ 'header': [1, 2, false] }],
+              ['bold', 'italic', 'underline'],
               [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-              ['bold', 'italic', 'underline', 'strike'],
-              [{ 'script': 'sub' }, { 'script': 'super' }],
-              [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
               ['link', 'image'],
               [{ 'align': [] }],
               ['clean']
@@ -95,41 +92,105 @@ const BlogForm = () => {
       const toolbar = document.querySelector('.ql-toolbar');
       if (toolbar) {
         let isDragging = false;
-        let startX, startY, initialX, initialY;
+        let startX, startY;
+
+        toolbar.style.position = 'fixed';
+        toolbar.style.cursor = 'move';
+        toolbar.style.zIndex = '1000';
+        toolbar.style.backgroundColor = '#9ca3af'; // Changed to gray-400
+        toolbar.style.color = '#ffffff'; // Changed to white
+        toolbar.style.padding = '5px';
+        toolbar.style.borderRadius = '3px';
+        toolbar.style.boxShadow = '0 1px 5px rgba(0,0,0,0.1)';
+        toolbar.style.fontSize = '10px';
+
+        // Set initial position to center
+        toolbar.style.top = '50%';
+        toolbar.style.left = '50%';
+        toolbar.style.transform = 'translate(-50%, -50%)';
+
+        const updateToolbarPosition = () => {
+          const rect = toolbar.getBoundingClientRect();
+          const maxX = window.innerWidth - rect.width;
+          const maxY = window.innerHeight - rect.height;
+
+          let left = parseInt(toolbar.style.left) || maxX / 2;
+          let top = parseInt(toolbar.style.top) || maxY / 2;
+
+          left = Math.max(0, Math.min(left, maxX));
+          top = Math.max(0, Math.min(top, maxY));
+
+          toolbar.style.left = `${left}px`;
+          toolbar.style.top = `${top}px`;
+        };
 
         const dragStart = (e) => {
           isDragging = true;
-          startX = e.clientX || e.touches[0].clientX;
-          startY = e.clientY || e.touches[0].clientY;
-          initialX = toolbar.offsetLeft;
-          initialY = toolbar.offsetTop;
-          document.addEventListener('mousemove', dragMove);
-          document.addEventListener('mouseup', dragEnd);
-          document.addEventListener('touchmove', dragMove);
-          document.addEventListener('touchend', dragEnd);
+          startX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
+          startY = e.type === 'mousedown' ? e.clientY : e.touches[0].clientY;
+          startX -= toolbar.offsetLeft;
+          startY -= toolbar.offsetTop;
+          e.preventDefault();
         };
 
         const dragMove = (e) => {
           if (isDragging) {
-            const clientX = e.clientX || e.touches[0].clientX;
-            const clientY = e.clientY || e.touches[0].clientY;
-            const dx = clientX - startX;
-            const dy = clientY - startY;
-            toolbar.style.left = `${initialX + dx}px`;
-            toolbar.style.top = `${initialY + dy}px`;
+            const clientX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type === 'mousemove' ? e.clientY : e.touches[0].clientY;
+            const newX = clientX - startX;
+            const newY = clientY - startY;
+            toolbar.style.left = `${newX}px`;
+            toolbar.style.top = `${newY}px`;
+            toolbar.style.transform = 'none';
+            updateToolbarPosition();
           }
         };
 
         const dragEnd = () => {
           isDragging = false;
-          document.removeEventListener('mousemove', dragMove);
-          document.removeEventListener('mouseup', dragEnd);
-          document.removeEventListener('touchmove', dragMove);
-          document.removeEventListener('touchend', dragEnd);
         };
 
+        // Mouse events
         toolbar.addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', dragMove);
+        document.addEventListener('mouseup', dragEnd);
+
+        // Touch events
         toolbar.addEventListener('touchstart', dragStart);
+        document.addEventListener('touchmove', dragMove);
+        document.addEventListener('touchend', dragEnd);
+
+        // Responsive adjustments
+        window.addEventListener('resize', updateToolbarPosition);
+
+        // Support for dark/light mode
+        const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const setColorScheme = (isDark) => {
+          document.documentElement.style.setProperty('--toolbar-bg-color', '#9ca3af'); // Changed to gray-400
+          document.documentElement.style.setProperty('--toolbar-text-color', '#ffffff'); // Changed to white
+        };
+
+        setColorScheme(darkModeMediaQuery.matches);
+        darkModeMediaQuery.addListener((e) => setColorScheme(e.matches));
+
+        // Reduce size of toolbar buttons
+        const buttons = toolbar.querySelectorAll('button');
+        buttons.forEach(button => {
+          button.style.width = '20px';
+          button.style.height = '20px';
+          button.style.padding = '2px';
+          button.style.minWidth = 'unset';
+          button.style.color = '#ffffff'; // Changed icon color to white
+        });
+
+        // Reduce size of toolbar dropdowns
+        const selects = toolbar.querySelectorAll('select');
+        selects.forEach(select => {
+          select.style.height = '20px';
+          select.style.padding = '0 2px';
+          select.style.fontSize = '12px';
+          select.style.color = '#ffffff'; // Changed text color to white
+        });
       }
     }
   }, []);
@@ -187,14 +248,14 @@ const BlogForm = () => {
   };
 
   return (
-    <div className="relative mt-8 p-6 max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-yellow-500 mb-6">
+    <div className="relative mt-4 p-4 max-w-xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+      <h2 className="text-xl font-bold text-gray-900 dark:text-yellow-500 mb-4">
         {postId ? 'Edit Blog Post' : 'Create a New Blog Post'}
       </h2>
-      {message && <p className={`text-sm ${message.includes('Error') ? 'text-red-500' : 'text-green-500'}`}>{message}</p>}
+      {message && <p className={`text-xs ${message.includes('Error') ? 'text-red-500' : 'text-green-500'}`}>{message}</p>}
       <motion.form
         onSubmit={handleSubmit}
-        className="space-y-4"
+        className="space-y-3"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -204,12 +265,12 @@ const BlogForm = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
+          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Title</label>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="mt-1 p-2 block w-full border dark:text-gray-900 dark:bg-gray-300 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1 p-1.5 text-sm block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700"
             required
           />
         </motion.div>
@@ -219,12 +280,12 @@ const BlogForm = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Author</label>
+          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Author</label>
           <input
             type="text"
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
-            className="mt-1 p-2 block w-full border dark:text-gray-900 dark:bg-gray-300 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1 p-1.5 text-sm block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700"
             required
           />
         </motion.div>
@@ -234,11 +295,11 @@ const BlogForm = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Description</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="mt-1 p-2 block w-full border dark:text-gray-900 dark:bg-gray-300 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 resize-y"
+            className="mt-1 p-1.5 text-sm block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 resize-y text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700"
             required
           />
         </motion.div>
@@ -248,9 +309,13 @@ const BlogForm = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <label className="block text-sm mb-8 font-medium text-gray-800 dark:text-gray-300">Content</label>
+          <label className="block text-xs mb-6 font-medium text-gray-700 dark:text-gray-300">Content</label>
           <div className="relative">
-            <div ref={quillRef} className="border dark:text-gray-300 border-gray-300 rounded-md" />
+            <div 
+              ref={quillRef} 
+              className="border border-gray-300 rounded-md text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700"
+              style={{ maxHeight: '400px', overflowY: 'auto' }}
+            />
           </div>
         </motion.div>
 
@@ -259,31 +324,31 @@ const BlogForm = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.5 }}
         >
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Image Cover</label>
+          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Image Cover</label>
           <input
             type="file"
             onChange={handleImageChange}
-            className="mt-1 block w-full border dark:text-gray-300 border-gray-300 rounded-md shadow-sm"
+            className="mt-1 text-xs block w-full border border-gray-300 rounded-md shadow-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700"
           />
           {imagePreview && (
-            <img src={imagePreview} alt="Image preview" className="mt-4 w-40 h-auto rounded-md shadow-sm" />
+            <img src={imagePreview} alt="Image preview" className="mt-3 w-32 h-auto rounded-md shadow-sm" />
           )}
         </motion.div>
 
         <motion.button
           type="submit"
-          className={`px-4 py-2 text-white rounded ${isSubmitting ? 'bg-gray-500' : 'bg-blue-500 hover:bg-blue-600'}`}
+          className={`px-3 py-1.5 text-sm text-white rounded ${isSubmitting ? 'bg-gray-500' : 'bg-blue-500 hover:bg-blue-600'}`}
           disabled={isSubmitting}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.6 }}
         >
-          {isSubmitting ? 'Submitting...' : (postId ? 'Update Blog Post' : 'Create Blog Post')}
+          {isSubmitting ? 'Submitting...' : (postId ? 'Update Post' : 'Create Post')}
         </motion.button>
       </motion.form>
       <button
         onClick={() => navigate('/blog-home')}
-        className="fixed bottom-4 left-4 bg-blue-500 text-white rounded-full px-4 py-2 shadow-lg hover:bg-blue-600 transition-colors duration-300"
+        className="fixed bottom-3 left-3 bg-blue-500 text-white text-xs rounded-full px-3 py-1.5 shadow-lg hover:bg-blue-600 transition-colors duration-300"
       >
         Back
       </button>

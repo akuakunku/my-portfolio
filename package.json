@@ -9,17 +9,33 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@types/three": "^0.167.1",
+    "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.39",
     "tailwindcss": "^3.4.6",
-    "vite": "^5.3.1"
+    "vite": "^5.3.5"
   },
   "dependencies": {
+    "@radix-ui/react-hover-card": "^1.1.1",
+    "@radix-ui/react-label": "^2.1.0",
+    "@react-three/drei": "^9.109.2",
+    "@react-three/fiber": "^8.16.8",
     "@supabase/supabase-js": "^2.44.4",
+    "@tabler/icons-react": "^3.11.0",
+    "@tsparticles/engine": "^3.5.0",
+    "@tsparticles/react": "^3.0.0",
+    "@tsparticles/slim": "^3.5.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "cobe": "^0.6.3",
     "dompurify": "^3.1.6",
     "dotenv": "^16.4.5",
     "emailjs-com": "^3.2.0",
-    "framer-motion": "^11.2.12",
+    "framer-motion": "^11.3.21",
+    "lucide-react": "^0.424.0",
+    "mini-svg-data-uri": "^1.4.4",
+    "qss": "^3.0.0",
     "quill": "^2.0.2",
     "quill-image-resize-module": "^3.0.0",
     "react": "^18.3.1",
@@ -30,7 +46,12 @@
     "react-quill": "^2.0.0",
     "react-router-dom": "^6.25.1",
     "react-scroll": "^1.9.0",
+    "simplex-noise": "^4.0.3",
     "supabase": "^1.187.3",
+    "tailwind-merge": "^2.4.0",
+    "tailwindcss-animate": "^1.0.7",
+    "three": "^0.167.1",
+    "three-globe": "^2.31.1",
     "uuid": "^10.0.0"
   }
 }

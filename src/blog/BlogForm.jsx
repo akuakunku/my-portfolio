@@ -42,22 +42,29 @@ const BlogForm = () => {
       fetchPost();
     }
   }, [postId]);
+  
   useEffect(() => {
     if (!quillInstance.current) {
       quillInstance.current = new Quill(quillRef.current, {
         theme: 'snow',
         modules: {
+          imageResize: {
+            displaySize: true,
+            modules: ['Resize', 'DisplaySize', 'Toolbar'],
+          },
           toolbar: {
             container: [
-              [{ 'header': [1, 2, false] }],
-              ['bold', 'italic', 'underline'],
-              [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+              [{ header: [1, 2, 3, 4, 5, 6, false] }],
+              ['bold', 'italic', 'underline', 'strike'],
+              [{ list: 'ordered' }, { list: 'bullet' }],
+              [{ color: [] }, { background: [] }],
               ['link', 'image'],
-              [{ 'align': [] }],
-              ['clean']
+              [{ align: [] }],
+              ['code-block'],
+              ['clean'],
             ],
             handlers: {
-              'image': function () {
+              image: function () {
                 const input = document.createElement('input');
                 input.setAttribute('type', 'file');
                 input.setAttribute('accept', 'image/*');
@@ -72,23 +79,29 @@ const BlogForm = () => {
                     const range = quillInstance.current.getSelection();
                     const img = document.createElement('img');
                     img.src = imageUrl;
-                    img.style.maxWidth = '80%';
+                    img.style.maxWidth = '50%';
                     img.classList.add('resizable-image');
+                    img.onclick = function () {
+                      if (img.style.maxWidth === '50%') {
+                        img.style.maxWidth = '50%';
+                      } else {
+                        img.style.maxWidth = '50%';
+                      }
+                    };
                     quillInstance.current.insertEmbed(range.index, 'image', imageUrl);
                   };
                   reader.readAsDataURL(file);
                 };
-              }
-            }
-          }
-        }
+              },
+            },
+          },
+        },
       });
 
       quillInstance.current.on('text-change', () => {
         setContent(quillInstance.current.root.innerHTML);
       });
 
-      // Add draggable functionality to the toolbar
       const toolbar = document.querySelector('.ql-toolbar');
       if (toolbar) {
         let isDragging = false;
@@ -97,14 +110,13 @@ const BlogForm = () => {
         toolbar.style.position = 'fixed';
         toolbar.style.cursor = 'move';
         toolbar.style.zIndex = '1000';
-        toolbar.style.backgroundColor = '#9ca3af'; // Changed to gray-400
-        toolbar.style.color = '#ffffff'; // Changed to white
+        toolbar.style.backgroundColor = '#9ca3af';
+        toolbar.style.color = '#ffffff';
         toolbar.style.padding = '5px';
         toolbar.style.borderRadius = '3px';
         toolbar.style.boxShadow = '0 1px 5px rgba(0,0,0,0.1)';
         toolbar.style.fontSize = '10px';
 
-        // Set initial position to center
         toolbar.style.top = '50%';
         toolbar.style.left = '50%';
         toolbar.style.transform = 'translate(-50%, -50%)';
@@ -150,50 +162,45 @@ const BlogForm = () => {
           isDragging = false;
         };
 
-        // Mouse events
         toolbar.addEventListener('mousedown', dragStart);
         document.addEventListener('mousemove', dragMove);
         document.addEventListener('mouseup', dragEnd);
 
-        // Touch events
         toolbar.addEventListener('touchstart', dragStart);
         document.addEventListener('touchmove', dragMove);
         document.addEventListener('touchend', dragEnd);
 
-        // Responsive adjustments
         window.addEventListener('resize', updateToolbarPosition);
 
-        // Support for dark/light mode
         const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
         const setColorScheme = (isDark) => {
-          document.documentElement.style.setProperty('--toolbar-bg-color', '#9ca3af'); // Changed to gray-400
-          document.documentElement.style.setProperty('--toolbar-text-color', '#ffffff'); // Changed to white
+          document.documentElement.style.setProperty('--toolbar-bg-color', '#9ca3af');
+          document.documentElement.style.setProperty('--toolbar-text-color', '#ffffff');
         };
 
         setColorScheme(darkModeMediaQuery.matches);
         darkModeMediaQuery.addListener((e) => setColorScheme(e.matches));
 
-        // Reduce size of toolbar buttons
         const buttons = toolbar.querySelectorAll('button');
-        buttons.forEach(button => {
+        buttons.forEach((button) => {
           button.style.width = '20px';
           button.style.height = '20px';
           button.style.padding = '2px';
           button.style.minWidth = 'unset';
-          button.style.color = '#ffffff'; // Changed icon color to white
+          button.style.color = '#ffffff';
         });
 
-        // Reduce size of toolbar dropdowns
         const selects = toolbar.querySelectorAll('select');
-        selects.forEach(select => {
+        selects.forEach((select) => {
           select.style.height = '20px';
           select.style.padding = '0 2px';
           select.style.fontSize = '12px';
-          select.style.color = '#ffffff'; // Changed text color to white
+          select.style.color = '#ffffff';
         });
       }
     }
   }, []);
+
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -314,7 +321,7 @@ const BlogForm = () => {
             <div 
               ref={quillRef} 
               className="border border-gray-300 rounded-md text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700"
-              style={{ maxHeight: '400px', overflowY: 'auto' }}
+              style={{ maxHeight: '200px', overflowY: 'auto' }}
             />
           </div>
         </motion.div>

@@ -27,57 +27,68 @@ const BlogPost = () => {
     fetchPost();
   }, [id]);
 
-  if (isLoading) return (
-    <motion.div
-      className="flex justify-center items-center h-screen"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
-    </motion.div>
-  );
+  if (isLoading)
+    return (
+      <motion.div
+        className="flex justify-center items-center h-screen"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+      </motion.div>
+    );
 
-  if (!post) return <p className="text-center text-gray-700 dark:text-gray-300">Post not found</p>;
+  if (!post)
+    return (
+      <p className="text-center text-gray-700 dark:text-gray-300">
+        Post not found
+      </p>
+    );
 
   const cleanContent = DOMPurify.sanitize(post.content);
 
-  const hasBeenEdited = post.updated_at && new Date(post.updated_at).getTime() > new Date(post.created_at).getTime();
+  const hasBeenEdited =
+    post.updated_at &&
+    new Date(post.updated_at).getTime() > new Date(post.created_at).getTime();
 
   const formatDateTime = (dateString) => {
     const date = new Date(dateString);
-    return `${formatDate(dateString)} at ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
+    return `${formatDate(dateString)} at ${date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+    })}`;
   };
 
   return (
     <AnimatePresence>
       <motion.div
-        className="relative mt-2 py-4 px-4 max-w-2xl mx-auto bg-gray-300 dark:bg-gray-900 rounded-lg shadow-lg"
+        className="relative py-8 px-4 md:px-8 lg:px-16 mx-auto bg-gray-300 dark:bg-gray-900 min-h-screen"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.5 }}
       >
-        <header className="mb-12">
+        <header className="mb-12 max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <div className="flex flex-wrap items-center text-sm text-gray-600 dark:text-gray-400 mb-2">
-              <span className="flex items-center mr-4 mb-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-2">
                 <FaUser className="mr-2" />
                 <span className="font-semibold">{post.author}</span>
-              </span>
-              <span className="flex items-center mr-4 mb-2">
+              </div>
+              <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-2">
                 <FaCalendarAlt className="mr-2" />
                 {formatDateTime(post.created_at)}
-              </span>
+              </div>
               {hasBeenEdited && (
-                <span className="flex items-center mb-2">
+                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-2">
                   <FaEdit className="mr-2" />
                   Last edited on {formatDateTime(post.updated_at)}
-                </span>
+                </div>
               )}
             </div>
             <motion.h1
@@ -93,14 +104,14 @@ const BlogPost = () => {
               <motion.img
                 src={post.image_url}
                 alt={post.title}
-                className="responsive-image mx-auto object-cover border border-blue-400 rounded-lg shadow-md mb-8 max-w-sm w-full h-auto"
+                className="w-1/2 h-auto mx-auto object-cover rounded-lg shadow-md mb-8"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.6 }}
               />
             )}
             <motion.p
-              className="text-gray-600 dark:text-gray-300 text-base mb-6"
+              className="text-gray-600 dark:text-gray-300 text-lg mb-6 md:text-base"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.8 }}
@@ -112,17 +123,15 @@ const BlogPost = () => {
         </header>
 
         <motion.article
-          className="prose prose-lg dark:prose-invert mb-12"
+          className="prose prose-lg dark:prose-invert mx-auto mb-12 max-w-3xl"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 1 }}
         >
-          <div
-            dangerouslySetInnerHTML={{ __html: cleanContent }}
-          />
+          <div dangerouslySetInnerHTML={{ __html: cleanContent }} />
         </motion.article>
 
-        <footer className="border-t border-gray-200 dark:border-gray-700 pt-4 text-gray-600 dark:text-gray-300 text-sm text-center">
+        <footer className="border-t border-gray-200 dark:border-gray-700 pt-4 text-gray-600 dark:text-gray-300 text-sm text-center max-w-7xl mx-auto">
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

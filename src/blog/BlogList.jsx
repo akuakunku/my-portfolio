@@ -17,7 +17,7 @@ const PAGE_SIZE = 6;
 const BlogPost = ({ post }) => (
   <motion.div
     key={post.id}
-    className="bg-white dark:bg-gray-900 rounded-lg border shadow overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-lg"
+    className={`bg-white dark:bg-gray-900 rounded-lg border-2 border-blue-600 dark:border-blue-700 shadow overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-lg`}
     initial={{ opacity: 0, scale: 0.9, rotateY: -90 }}
     animate={{ opacity: 1, scale: 1, rotateY: 0 }}
     exit={{ opacity: 0, scale: 0.9, rotateY: 90 }}
@@ -28,7 +28,7 @@ const BlogPost = ({ post }) => (
       <motion.img
         src={post.image_url}
         alt={post.title}
-        className="w-full h-24 sm:h-28 object-cover"
+        className="w-full h-24 sm:h-24 object-cover border-2 rounded-lg p-2"
         whileHover={{ scale: 1.05 }}
         transition={{ duration: 0.3 }}
       />
@@ -39,10 +39,10 @@ const BlogPost = ({ post }) => (
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
     >
-      <h2 className="text-lg sm:text-xl font-semibold mb-5 text-gray-900 dark:text-gray-100">
+      <h2 className="text-lg sm:text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">
         {truncateTitle(post.title, 30)}
       </h2>
-      <div className="flex items-center text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3">
+      <div className="flex items-center text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2">
         <FaUser className="mr-1 text-xs" />
         <span className="font-medium mr-3">{post.author}</span>
         <FaCalendarAlt className="mr-1 text-xs" />

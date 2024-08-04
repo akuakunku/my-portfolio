@@ -67,3 +67,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+.ql-editor img {
+  max-width: 100%;
+  height: auto;
+}
+
+.ql-editor img.resizable {
+  cursor: pointer;
+}
+
+.ql-editor img.resizable:hover {
+  border: 1px solid #ccc;
+}

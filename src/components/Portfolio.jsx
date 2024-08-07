@@ -18,6 +18,12 @@ const Portfolio = ({ theme }) => {
       link: "https://heaven-link.vercel.app/"
     },
     {
+      title: "Resep Masakan Indonesia",
+      description: "A website that provides various Indonesian recipes.",
+      image: "/img/projects1.jpg",
+      link: "https://resep-bunda.vercel.app/"
+    },
+    {
       title: "Web App Manajemen Pembayaran",
       description: "Web app untuk mendata atau memasukan data client yang sudah membayar wifi bulanan.",
       image: "/img/projects3.jpg",
@@ -29,12 +35,7 @@ const Portfolio = ({ theme }) => {
       image: "/img/projects4.jpg",
       link: "https://chord-gitar.vercel.app/"
     },
-    {
-      title: "Resep Masakan Indonesia",
-      description: "A website that provides various Indonesian recipes.",
-      image: "/img/projects1.jpg",
-      link: "http://chesko.wuaze.com/"
-    },
+  
   ];
 
   const itemsPerPage = 3;

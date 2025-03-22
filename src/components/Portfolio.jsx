@@ -35,7 +35,26 @@ const Portfolio = ({ theme }) => {
       image: "/img/projects4.jpg",
       link: "https://chord-gitar.vercel.app/"
     },
-  
+    {
+      title: "Smart TV",
+      description: "A project for smart TV applications.",
+      image: "/img/projects5.jpg", // Placeholder image
+      link: "https://github.com/chesko21/smart_tv"
+    },
+    {
+      title: "M3U Editor",
+      description: "A tool for editing M3U playlists.",
+      image: "/img/projects6.jpg", // Placeholder image
+      link: "https://m3u-editor-eta.vercel.app/"
+    },
+    {
+      title: "Chesko TV",
+      description: "A project for Chesko TV applications.",
+      image: "/img/projects7.jpg", // Placeholder image
+      link: "https://github.com/chesko21/Chesko_TV"
+    },
+
+
   ];
 
   const itemsPerPage = 3;

@@ -65,9 +65,10 @@ const App = () => {
                 <section id="contact">
                   <Contact />
                 </section>
-                <section id="blog">
+                {/* <section id="blog">
                   <BlogList />
-                </section>
+                </section> */}
+
               </div>
             } />
             <Route path="/admin-login" element={<AdminLogin setLoggedIn={setIsAuthenticated} />} />

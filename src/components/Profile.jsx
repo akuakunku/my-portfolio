@@ -190,7 +190,7 @@ const Profile = ({ theme }) => {
         </div>
       </motion.div>
 
-      {/* Enhanced Member Card Carousel with Refined 3D Effect, Touch Support, and Improved Responsiveness */}
+      {/* 
       <motion.div 
         className="mt-12 relative z-10 perspective-1000"
         initial={{ opacity: 0 }}
@@ -252,6 +252,8 @@ const Profile = ({ theme }) => {
           </motion.div>
         </AnimatePresence>
       </motion.div>
+      */}
+
     </motion.section>
   );
 };

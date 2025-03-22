@@ -57,7 +57,7 @@ const Portfolio = ({ theme }) => {
 
   ];
 
-  const itemsPerPage = 3;
+  const itemsPerPage = 9;
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(projects.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;

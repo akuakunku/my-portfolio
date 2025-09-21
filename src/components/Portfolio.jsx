@@ -30,6 +30,12 @@ const Portfolio = ({ theme }) => {
       link: "https://app-pembayaran-wifi.vercel.app/"
     },
     {
+      title: "Al Quran digital",
+      description: "Aplikasi Al quran digital for android",
+      image: "/img/projects3.jpg",
+      link: "https://github.com/akuakunku/alquran-digital/"
+    },
+    {
       title: "Chord Gitar",
       description: "Web untuk chord gitar.",
       image: "/img/projects4.jpg",

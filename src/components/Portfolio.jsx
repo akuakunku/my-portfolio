@@ -32,8 +32,14 @@ const Portfolio = ({ theme }) => {
     {
       title: "Al Quran digital",
       description: "Aplikasi Al quran digital for android",
-      image: "/img/projects3.jpg",
+      image: "/img/aku.jpg",
       link: "https://github.com/akuakunku/alquran-digital/"
+    },
+    {
+      title: "IPTV_EDITOR",
+      description: "Aplikasi m3u editor dengan python",
+      image: "/img/aku.jpg",
+      link: "https://github.com/chesko21/iptv_edit/"
     },
     {
       title: "Chord Gitar",
@@ -44,19 +50,19 @@ const Portfolio = ({ theme }) => {
     {
       title: "Smart TV",
       description: "A project for smart TV applications.",
-      image: "/img/projects5.jpg", // Placeholder image
+      image: "/img/aku.jpg", 
       link: "https://github.com/chesko21/smart_tv"
     },
     {
       title: "M3U Editor",
       description: "A tool for editing M3U playlists.",
-      image: "/img/projects6.jpg", // Placeholder image
+      image: "/img/aku.jpg", 
       link: "https://m3u-editor-eta.vercel.app/"
     },
     {
       title: "Chesko TV",
       description: "A project for Chesko TV applications.",
-      image: "/img/projects7.jpg", // Placeholder image
+      image: "/img/aku.jpg", 
       link: "https://github.com/chesko21/Chesko_TV"
     },
 

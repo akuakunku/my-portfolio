@@ -137,10 +137,10 @@ const Portfolio = () => {
       {/* Newspaper Header */}
       <div className="max-w-7xl mx-auto mb-16 border-b-4 border-white/10 pb-8 flex flex-col md:flex-row justify-between items-end gap-4 px-2">
         <div className="w-full md:w-auto">
-          <h2 className="text-5xl md:text-8xl font-black tracking-tighter uppercase italic cyber-text-gradient py-2 px-1 overflow-visible">
+          <h2 className="text-4xl md:text-8xl font-black tracking-tighter uppercase italic cyber-text-gradient py-2 px-1 overflow-visible">
             PROJECT_ARCHIVES
           </h2>
-          <p className="font-mono text-[9px] md:text-xs text-cyber-blue/60 tracking-[0.3em] md:tracking-[0.5em] mt-2">
+          <p className="font-mono text-[8px] md:text-xs text-cyber-blue/60 tracking-[0.2em] md:tracking-[0.5em] mt-2">
             DAILY_INTEL_REPORT // SECTOR_WEB_DEV // {new Date().toLocaleDateString()}
           </p>
         </div>

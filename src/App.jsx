@@ -1,10 +1,10 @@
 import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Lenis from '@studio-freight/lenis';
 import Layout from './components/Layout';
 import Profile from './components/Profile';
 import Portfolio from './components/Portfolio';
 import Contact from './components/Contact';
-import BlogList from './blog/BlogList';
 import AdminLogin from './blog/AdminLogin';
 import ProtectedRoute from './components/ProtectedRoute';
 import NotFound from './components/NotFound';
@@ -15,14 +15,32 @@ const BlogPost = lazy(() => import('./blog/BlogPost'));
 const BlogForm = lazy(() => import('./blog/BlogForm'));
 
 const App = () => {
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
   const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem('isAuthenticated') === 'true');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark');
-    localStorage.setItem('theme', theme);
-  }, [theme]);
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+    });
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+
+    return () => {
+      lenis.destroy();
+    };
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.add('dark');
+    localStorage.setItem('theme', 'dark');
+  }, []);
 
   useEffect(() => {
     const checkAuthentication = () => {
@@ -35,11 +53,6 @@ const App = () => {
     }, 1500);
   }, []);
 
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-  };
-
   const handleLogout = () => {
     localStorage.removeItem('isAuthenticated');
     setIsAuthenticated(false);
@@ -50,25 +63,21 @@ const App = () => {
   }
 
   return (
-    <Router>
-      <Layout toggleTheme={toggleTheme} theme={theme} isAuthenticated={isAuthenticated} handleLogout={handleLogout}>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <Layout isAuthenticated={isAuthenticated} handleLogout={handleLogout}>
         <Suspense fallback={<div>Loading...</div>}>
           <Routes>
             <Route path="/" element={
               <div>
                 <section id="profile">
-                  <Profile theme={theme} />
+                  <Profile />
                 </section>
                 <section id="portfolio">
-                  <Portfolio theme={theme} />
+                  <Portfolio />
                 </section>
                 <section id="contact">
                   <Contact />
                 </section>
-                {/* <section id="blog">
-                  <BlogList />
-                </section> */}
-
               </div>
             } />
             <Route path="/admin-login" element={<AdminLogin setLoggedIn={setIsAuthenticated} />} />

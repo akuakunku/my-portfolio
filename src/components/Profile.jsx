@@ -1,260 +1,243 @@
-import React from 'react';
-import { FaGithub, FaInstagram, FaTiktok } from 'react-icons/fa';
-import { FaThreads } from 'react-icons/fa6';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { FaSatellite, FaSatelliteDish } from 'react-icons/fa';
 
-// Define enhanced motion variants for animations
-const cardVariants = {
-  hover: {
-    rotateY: 15,
-    rotateX: 5,
-    scale: 1.05,
-    boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.2)",
-    transition: {
-      duration: 0.5,
-      type: 'spring',
-      stiffness: 100,
-    },
-  },
-};
+gsap.registerPlugin(ScrollTrigger);
 
-const getTextVariants = (theme) => ({
-  hover: {
-    color: theme === 'dark'
-      ? ['#ffffff', '#1e3a8a', '#c2b90e', '#ffffff']
-      : ['#000000', '#041069', '#260105', '#000000'],
-    transition: {
-      duration: 2,
-      repeat: Infinity,
-      ease: 'easeInOut',
-    },
-  },
-});
+const Profile = () => {
+  const sectionRef = useRef(null);
+  const titleRef = useRef(null);
+  const subtitleRef = useRef(null);
+  const imageRef = useRef(null);
+  const containerRef = useRef(null);
+  const spaceRef = useRef(null);
 
-const iconVariants = {
-  hover: {
-    scale: 1.3,
-    y: -5,
-    rotate: [0, -10, 10, -10, 0],
-    boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)',
-    transition: {
-      type: 'spring',
-      stiffness: 300,
-      duration: 0.5,
-    },
-  },
-};
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
 
-const tooltipVariants = {
-  initial: {
-    opacity: 0,
-    y: 10,
-    scale: 0.8,
-  },
-  hover: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.3,
-      type: 'spring',
-      stiffness: 200,
-    },
-  },
-};
+      // 1. Initial State: Background Reveal
+      tl.fromTo(imageRef.current, 
+        { scale: 1.4, filter: "blur(30px)", opacity: 0 },
+        { scale: 1.1, filter: "blur(0px)", opacity: 0.3, duration: 2.5 }
+      )
+      
+      // 2. Character-by-character Title Animation
+      .fromTo(".title-char", 
+        { y: 150, rotateX: -90, opacity: 0 },
+        { y: 0, rotateX: 0, opacity: 1, stagger: 0.05, duration: 1.5 },
+        "-=1.8"
+      )
 
-const Profile = ({ theme }) => {
-  const isDarkTheme = theme === 'dark';
-  const textVariants = getTextVariants(theme);
+      // 3. Subtitle Lines Reveal
+      .from(".subtitle-line", {
+        x: -50,
+        opacity: 0,
+        stagger: 0.15,
+        duration: 1.2
+      }, "-=1.2")
+
+      // 4. Description Reveal (Typewriter-ish)
+      .from(".profile-desc", {
+        opacity: 0,
+        y: 20,
+        duration: 1,
+        ease: "power2.out"
+      }, "-=0.8")
+
+      // 5. HUD & UI Elements Entry
+      .from(".hud-line", {
+        width: 0,
+        duration: 1,
+        stagger: 0.1
+      }, "-=1")
+      .from(".hud-text", {
+        opacity: 0,
+        x: -10,
+        duration: 0.5,
+        stagger: 0.05
+      }, "-=0.5");
+
+      // Advanced Scroll Interactions
+      gsap.to(imageRef.current, {
+        yPercent: 20,
+        scale: 1.2,
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: true
+        }
+      });
+
+      // Space Objects Animation
+      const objects = gsap.utils.toArray('.space-obj');
+      objects.forEach((obj) => {
+        const speed = obj.dataset.speed || 1;
+        const direction = obj.dataset.dir === 'left' ? -1 : 1;
+        
+        gsap.to(obj, {
+          x: `${direction * 150}vw`,
+          y: `${(Math.random() - 0.5) * 100}vh`,
+          rotation: direction * 360,
+          duration: 20 / speed,
+          repeat: -1,
+          ease: "none",
+          delay: Math.random() * 10,
+          onRepeat: () => {
+            gsap.set(obj, { 
+              x: `${-direction * 150}vw`,
+              y: `${(Math.random() - 0.5) * 100}vh` 
+            });
+          }
+        });
+      });
+
+      // Mouse Move Parallax for Title
+      const handleMouseMove = (e) => {
+        const { clientX, clientY } = e;
+        const xPos = (clientX / window.innerWidth - 0.5) * 40;
+        const yPos = (clientY / window.innerHeight - 0.5) * 40;
+
+        gsap.to(containerRef.current, {
+          x: xPos,
+          y: yPos,
+          duration: 1,
+          ease: "power2.out"
+        });
+      };
+
+      window.addEventListener('mousemove', handleMouseMove);
+      return () => window.removeEventListener('mousemove', handleMouseMove);
+
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  const name = "CHESKO";
 
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8 }}
-      className={`relative container mx-auto p-4 md:p-8 rounded-lg shadow-lg ${isDarkTheme ? 'bg-gray-900 text-gray-200' : 'bg-gray-100 text-gray-900'}`}
-      aria-label="Profile Section"
+    <section
+      ref={sectionRef}
+      className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-[#050505] perspective-1000"
     >
-      {/* Enhanced Aurora Background */}
-      <motion.div 
-        className={`rounded-lg absolute inset-0 ${isDarkTheme ? 'bg-gradient-to-r from-slate-800 via-purple-800 to-slate-800' : 'bg-gradient-to-r from-gray-200 via-purple-300 to-slate-300'} opacity-50 pointer-events-none`}
-        animate={{
-          background: isDarkTheme 
-            ? ['linear-gradient(to right, #1a202c, #4a1d96, #1a202c)', 'linear-gradient(to left, #1a202c, #4a1d96, #1a202c)']
-            : ['linear-gradient(to right, #f7fafc, #d6bcfa, #e2e8f0)', 'linear-gradient(to left, #f7fafc, #d6bcfa, #e2e8f0)'],
-        }}
-        transition={{ duration: 10, repeat: Infinity, repeatType: "reverse" }}
-      ></motion.div>
-      {/* Enhanced Glowing Stars */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, index) => (
-          <motion.div
-            key={index}
-            className={`absolute w-1 h-1 rounded-full ${isDarkTheme ? 'bg-blue-400' : 'bg-yellow-400'}`}
-            initial={{ opacity: 0.2, scale: 0.8 }}
-            animate={{ 
-              opacity: [0.2, 1, 0.2], 
-              scale: [0.8, 1.5, 0.8],
-              x: Math.random() * 200 - 100,
-              y: Math.random() * 100 - 50,
-            }}
-            transition={{ 
-              duration: 2 + Math.random() * 3, 
-              repeat: Infinity,
-              repeatType: 'reverse'
-            }}
+      {/* Background Cinematic Layer */}
+      <div ref={imageRef} className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#050505] z-10"></div>
+        <img
+          src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop"
+          alt="Tech Background"
+          className="w-full h-full object-cover"
+        />
+      </div>
+
+      {/* Space Animation Layer */}
+      <div ref={spaceRef} className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
+        {/* Satellites */}
+        <div className="space-obj absolute top-[20%] left-[-10%] text-cyber-primary/20" data-speed="0.3" data-dir="right">
+          <FaSatellite size={30} />
+        </div>
+        <div className="space-obj absolute top-[60%] right-[-10%] text-cyber-primary/15" data-speed="0.2" data-dir="left">
+          <FaSatelliteDish size={25} />
+        </div>
+
+        {/* Spacecraft / Ships */}
+        <div className="space-obj absolute top-[40%] left-[-20%] text-white/10" data-speed="1.5" data-dir="right">
+          <svg width="40" height="20" viewBox="0 0 40 20" fill="currentColor">
+            <path d="M0 10 L10 0 L40 10 L10 20 Z" />
+          </svg>
+        </div>
+        <div className="space-obj absolute top-[80%] right-[-20%] text-white/5" data-speed="1.2" data-dir="left">
+          <svg width="30" height="15" viewBox="0 0 30 15" fill="currentColor">
+            <path d="M30 7.5 L20 0 L0 7.5 L20 15 Z" />
+          </svg>
+        </div>
+
+        {/* Shooting Stars */}
+        {[...Array(3)].map((_, i) => (
+          <div 
+            key={i}
+            className="absolute h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-20"
             style={{
+              width: '100px',
               top: `${Math.random() * 100}%`,
               left: `${Math.random() * 100}%`,
+              transform: 'rotate(-45deg)',
+              animation: `shooting-star ${5 + Math.random() * 10}s linear infinite`,
+              animationDelay: `${Math.random() * 10}s`
             }}
-          ></motion.div>
+          ></div>
         ))}
       </div>
 
-      <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8 relative z-10">
-        <motion.img
-          src="/img/aku.jpg"
-          alt="Chesko Profile"
-          className={`rounded-full w-32 h-32 md:w-44 md:h-44 object-cover border-4 ${isDarkTheme ? 'border-blue-500' : 'border-blue-400'} shadow-lg`}
-          aria-label="Profile Image"
-          whileHover="hover"
-          variants={cardVariants}
-        />
-        <div className="flex-1 text-center md:text-left">
-          <motion.h3
-            className={`text-4xl font-extrabold mb-2 transition-transform duration-300 ${isDarkTheme ? 'text-gray-300' : 'text-gray-900'}`}
-            whileHover="hover"
-            variants={textVariants}
-          >
-            Chesko
-          </motion.h3>
-          <motion.p 
-            className={`text-xl font-medium mb-4 ${isDarkTheme ? 'text-blue-300' : 'text-blue-500'}`}
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: 'spring', stiffness: 300 }}
-          >
-            @chesko_oneOnly
-          </motion.p>
-          <motion.p
-            className={`text-base md:text-lg mb-6 leading-relaxed ${isDarkTheme ? 'text-gray-400' : 'text-gray-800'}`}
-            whileHover="hover"
-            variants={textVariants}
-          >
-            As a passionate web developer, I specialize in crafting dynamic user experiences with modern technologies. With expertise in JavaScript, Tailwind CSS, and SQL DATABASE, I am committed to delivering high-quality solutions that not only meet but exceed expectations. Driven by an unwavering dedication to innovation and lifelong learning, I continually seek to transform ideas into impactful digital experiences.
-          </motion.p>
+      {/* Decorative HUD Frames */}
+      <div className="absolute inset-0 z-20 pointer-events-none p-8 md:p-12">
+        <div className="hud-line absolute top-12 left-12 h-px bg-cyber-primary/30 w-32 origin-left"></div>
+        <div className="hud-line absolute top-12 left-12 w-px bg-cyber-primary/30 h-32 origin-top"></div>
+        <div className="hud-line absolute bottom-12 right-12 h-px bg-cyber-primary/30 w-32 origin-right"></div>
+        <div className="hud-line absolute bottom-12 right-12 w-px bg-cyber-primary/30 h-32 origin-bottom"></div>
+        
+        {/* Dynamic HUD Data */}
+        <div className="absolute top-24 left-12 space-y-4">
+          {["SYSTEM_ACTIVE", "NODE_01", "CORE_SYNC: 99%"].map((text, i) => (
+            <div key={i} className="hud-text flex items-center space-x-3 font-mono text-[8px] text-cyber-primary/50 tracking-[0.4em]">
+              <span className="w-1 h-1 bg-cyber-primary rounded-full animate-pulse"></span>
+              <span>{text}</span>
+            </div>
+          ))}
         </div>
       </div>
 
-      <motion.div 
-        className="flex flex-col items-center mt-8 relative z-10"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 0.5 }}
-      >
-        <h2 className={`text-2xl font-semibold mb-4 ${isDarkTheme ? 'text-gray-300' : 'text-gray-900'}`}>
-          Connect with Me
-        </h2>
-        <div className="flex space-x-6 justify-center relative">
-          {[
-            { icon: FaGithub, href: "https://github.com/chesko21", label: "GitHub" },
-            { icon: FaThreads, href: "https://www.threads.net/@chesko_afiq", label: "Threads" },
-            { icon: FaInstagram, href: "https://www.instagram.com/chesko_afiq/", label: "Instagram" },
-            { icon: FaTiktok, href: "https://www.tiktok.com/@afiq_chesko1", label: "TikTok" }
-          ].map((item, index) => (
-            <motion.div
-              key={index}
-              className="relative group"
-              whileHover="hover"
-              variants={tooltipVariants}
-            >
-              <motion.a
-                href={item.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`text-gray-700 hover:text-gray-500 ${isDarkTheme ? 'text-gray-300' : 'text-gray-700'}`}
-                aria-label={`${item.label} Profile`}
-                variants={iconVariants}
-                whileHover="hover"
-              >
-                <item.icon size={30} />
-              </motion.a>
-              <motion.span
-                className={`absolute -top-8 left-1/2 transform -translate-x-1/2 px-2 py-1 text-sm ${isDarkTheme ? 'bg-gray-800 text-white' : 'bg-gray-800 text-white'} rounded opacity-0 group-hover:opacity-100`}
-                initial="initial"
-                animate="hover"
-              >
-                {item.label}
-              </motion.span>
-            </motion.div>
+      <div ref={containerRef} className="relative z-30 text-center px-4 max-w-6xl mx-auto">
+        <h1 
+          ref={titleRef}
+          className="text-[12vw] md:text-[15vw] font-black tracking-tighter mb-4 leading-none flex justify-center overflow-visible py-4"
+        >
+          {name.split("").map((char, i) => (
+            <span key={i} className="title-char inline-block px-1 cyber-text-gradient">{char}</span>
+          ))}
+        </h1>
+
+        <div 
+          ref={subtitleRef}
+          className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-12 text-gray-500 mb-12"
+        >
+          {["Web Developer", "UI/UX Designer", "JS Specialist"].map((text, i) => (
+            <div key={i} className="subtitle-line flex items-center space-x-4">
+              <span className="w-1 h-1 bg-cyber-primary rotate-45"></span>
+              <span className="font-mono tracking-[0.4em] uppercase text-[10px] md:text-xs text-white/80">{text}</span>
+            </div>
           ))}
         </div>
-      </motion.div>
+        
+        <div className="profile-desc max-w-xl mx-auto border-t border-white/5 pt-12">
+          <p className="text-gray-500 text-[10px] md:text-xs leading-loose font-mono uppercase tracking-[0.2em]">
+            Specializing in high-performance digital experiences. 
+            Merging aesthetic precision with technical excellence to build the next generation of web interfaces.
+          </p>
+        </div>
 
-      {/* 
-      <motion.div 
-        className="mt-12 relative z-10 perspective-1000"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8, duration: 0.5 }}
-      >
-        <AnimatePresence>
-          <motion.div 
-            className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8"
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "-100%" }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          >
-            {['/img/certificate.png', '/img/certificate.png', '/img/certificate.png'].map((imageUrl, index) => (
-              <motion.div
-                key={index}
-                className={`w-full sm:w-64 md:w-72 lg:w-80 h-32 sm:h-36 md:h-40 ${isDarkTheme ? 'bg-gray-800 text-gray-200' : 'bg-white text-gray-900'} rounded-lg shadow-xl p-2 sm:p-3 md:p-4 cursor-pointer overflow-hidden`}
-                style={{
-                  transformStyle: "preserve-3d",
-                  transform: "rotateX(25deg) rotateY(10deg)",
-                  boxShadow: "0 10px 30px -5px rgba(0, 0, 0, 0.3)",
-                }}
-                whileHover={{
-                  scale: 1.05,
-                  rotateY: [-10, 10, -10, 10, -10],
-                  rotateX: [25, 30, 20, 30, 25],
-                  transition: {
-                    duration: 1.5,
-                    ease: "easeInOut",
-                  },
-                }}
-                drag
-                dragConstraints={{ left: -25, right: 25, top: -15, bottom: 15 }}
-                dragElastic={0.05}
-                whileTap={{ scale: 0.98, rotateX: 35 }}
-                whileDrag={{
-                  rotateY: [-15, 15],
-                  rotateX: [20, 35],
-                  transition: { duration: 0.2, ease: "easeOut" }
-                }}
-              >
-                <motion.img
-                  src={imageUrl}
-                  alt={`Certificate ${index + 1}`}
-                  className="w-full h-full object-cover rounded-md transition-transform duration-300"
-                  loading="lazy"
-                  style={{
-                    transform: "translateZ(20px)",
-                    boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
-                  }}
-                />
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-br from-transparent to-black opacity-10 rounded-md"
-                  style={{ transform: "translateZ(10px)" }}
-                />
-              </motion.div>
-            ))}
-          </motion.div>
-        </AnimatePresence>
-      </motion.div>
-      */}
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-[-10vh] left-1/2 -translate-x-1/2 flex flex-col items-center">
+          <div className="w-px h-20 bg-gradient-to-b from-cyber-primary to-transparent"></div>
+        </div>
+      </div>
 
-    </motion.section>
+      {/* Floating Personal Node - Left Bottom */}
+      <div className="hud-text absolute bottom-32 md:bottom-12 left-6 md:left-12 z-40 flex items-center space-x-4 md:space-x-6 glassmorphism p-3 md:p-4 border border-white/5">
+        <img 
+          src="/img/aku.jpg" 
+          alt="Node" 
+          className="w-10 h-10 md:w-14 md:h-14 rounded-none border border-cyber-primary/20 grayscale hover:grayscale-0 transition-all duration-700"
+        />
+        <div className="text-left font-mono">
+          <p className="text-white text-[8px] md:text-[10px] font-bold tracking-widest uppercase">CHESKO_AFIQ</p>
+          <p className="text-cyber-primary/50 text-[6px] md:text-[8px] mt-1 tracking-widest uppercase">EST_2026 // PORTFOLIO_V4</p>
+        </div>
+      </div>
+    </section>
   );
 };
 

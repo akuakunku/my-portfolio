@@ -1,191 +1,141 @@
-import React, { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { FaGithub, FaBars, FaTimes, FaSignOutAlt, FaHome, FaUserShield } from 'react-icons/fa';
+import React, { useEffect, useState, useRef } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { FaGithub, FaHome, FaMicrochip, FaUserShield, FaBars, FaTimes } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const Header = ({ toggleTheme, theme, isAuthenticated, handleLogout }) => {
-  const [menuOpen, setMenuOpen] = React.useState(false);
-  const menuRef = useRef(null);
+const Header = () => {
+  const [isVisible, setIsVisible] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const headerRef = useRef(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleMenuToggle = () => {
-    setMenuOpen(!menuOpen);
+  const handleScrollTo = (e, targetId) => {
+    if (e) e.preventDefault();
+    setIsMenuOpen(false);
+    
+    if (location.pathname !== '/') {
+      navigate('/#' + targetId);
+      return;
+    }
+
+    const element = document.getElementById(targetId);
+    if (element) {
+      const offset = 0; 
+      const bodyRect = document.body.getBoundingClientRect().top;
+      const elementRect = element.getBoundingClientRect().top;
+      const elementPosition = elementRect - bodyRect;
+      const offsetPosition = elementPosition - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
   };
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setMenuOpen(false);
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
       }
+      setLastScrollY(currentScrollY);
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+    if (!isMenuOpen) {
+      window.addEventListener('scroll', handleScroll);
+    }
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY, isMenuOpen]);
+
+  const menuItems = [
+    { id: 'home', label: 'Home', icon: FaHome, to: '/', action: (e) => { e.preventDefault(); navigate('/'); window.scrollTo({ top: 0, behavior: 'smooth' }); } },
+    { id: 'portfolio', label: 'Projects', icon: FaMicrochip, to: '#portfolio', action: (e) => handleScrollTo(e, 'portfolio') },
+    { id: 'admin', label: 'Admin', icon: FaUserShield, to: '/admin-login', action: (e) => { e.preventDefault(); navigate('/admin-login'); } },
+    { id: 'github', label: 'GitHub', icon: FaGithub, to: 'https://github.com/chesko21', action: () => window.open('https://github.com/chesko21', '_blank') },
+  ];
 
   return (
-    <header className="sticky top-0 z-40 bg-white dark:bg-gray-900 shadow-md">
-      <motion.div
-        className={`container mx-auto flex justify-between items-center p-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+    <>
+      {/* PC Header - Original Style */}
+      <motion.header
+        ref={headerRef}
+        initial={{ y: 0 }}
+        animate={{ y: isVisible ? 0 : -100 }}
+        transition={{ duration: 0.5, ease: "circOut" }}
+        className="fixed top-0 left-0 w-full z-50 px-8 py-6 flex justify-between items-center mix-blend-difference"
       >
-        <h1 className="text-2xl font-bold cursor-pointer">
-          <Link to="/">C_Portfolio</Link>
-        </h1>
-        <div className="hidden md:flex items-center space-x-6">
-          <Link to="/" className="flex items-center space-x-2 hover:text-purple-600 transition-colors">
-            <FaHome className="text-xl" />
-            <span>Home</span>
-          </Link>
-          <Link to="/admin-login" className="flex items-center space-x-2 hover:text-purple-600 transition-colors">
-            <FaUserShield className="text-xl" />
-            <span>Admin</span>
-          </Link>
-          <a href="https://github.com/chesko21" className="text-2xl hover:text-purple-600 transition-colors">
-            <FaGithub />
-          </a>
-          {isAuthenticated && (
+        <Link to="/" className="group flex items-center space-x-4">
+          <img src="/chesko-logo.svg" alt="Logo" className="w-8 h-8 filter brightness-200 logo-glitch-effect transition-all" />
+          <div className="flex flex-col">
+            <span className="text-white font-black tracking-tighter text-xl leading-none uppercase">CHESKO</span>
+            <span className="text-white font-mono text-[8px] tracking-[0.4em] uppercase opacity-50 group-hover:opacity-100 transition-opacity">Portfolio_2026</span>
+          </div>
+        </Link>
+
+        {/* Desktop Nav - Visible only on MD and up */}
+        <nav className="hidden md:flex items-center space-x-12">
+          {menuItems.map((item) => (
+            item.id === 'portfolio' ? (
+              <a
+                key={item.id}
+                href={item.to}
+                onClick={item.action}
+                className="text-white font-mono text-[10px] uppercase tracking-[0.3em] hover:text-gray-400 transition-colors relative group"
+              >
+                {item.label}
+                <span className="absolute -bottom-1 left-0 w-0 h-px bg-white transition-all duration-300 group-hover:w-full"></span>
+              </a>
+            ) : (
+              <Link
+                key={item.id}
+                to={item.to}
+                className="text-white font-mono text-[10px] uppercase tracking-[0.3em] hover:text-gray-400 transition-colors relative group"
+              >
+                {item.label}
+                <span className="absolute -bottom-1 left-0 w-0 h-px bg-white transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+            )
+          ))}
+        </nav>
+      </motion.header>
+
+      {/* Mobile Bottom Navbar - Fixed at bottom */}
+      <div className="md:hidden fixed bottom-0 left-0 w-full z-[100] px-4 pb-6">
+        <div className="glassmorphism rounded-2xl border border-white/10 flex justify-around items-center py-4 px-2 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+          {menuItems.map((item) => (
             <button
-              onClick={handleLogout}
-              className="text-2xl hover:text-red-600 transition-colors"
-              aria-label="Logout"
+              key={item.id}
+              onClick={item.action}
+              className="flex flex-col items-center space-y-1 group"
             >
-              <FaSignOutAlt />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-400 group-hover:text-cyber-primary group-hover:bg-cyber-primary/10 transition-all duration-300">
+                <item.icon size={20} />
+              </div>
+              <span className="text-[9px] font-mono uppercase tracking-widest text-gray-500 group-hover:text-cyber-primary transition-colors">
+                {item.label}
+              </span>
             </button>
-          )}
-          <button
-            onClick={toggleTheme}
-            className="text-2xl hover:text-yellow-500 transition-colors"
-            aria-label="Toggle theme"
-          >
-            {theme === 'dark' ? '🌞' : '🌜'}
-          </button>
+          ))}
         </div>
-        <div className="md:hidden flex items-center space-x-4">
-          <button
-            onClick={toggleTheme}
-            className="text-2xl hover:text-yellow-500 transition-colors"
-            aria-label="Toggle theme"
-          >
-            {theme === 'dark' ? '🌞' : '🌜'}
-          </button>
-          <button
-            onClick={handleMenuToggle}
-            className="text-2xl focus:outline-none"
-            aria-label="Toggle menu"
-          >
-            {menuOpen ? <FaTimes /> : <FaBars />}
-          </button>
-        </div>
-      </motion.div>
+      </div>
+
+      {/* Mobile Background Blur Overlay */}
       <AnimatePresence>
-        {menuOpen && (
+        {isMenuOpen && (
           <motion.div
-            className="fixed inset-0 flex items-center justify-center z-50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <motion.div
-              ref={menuRef}
-              className="bg-slate-800 bg-opacity-90 border-2 border-yellow-500 dark:border-gray-600 rounded-full w-56 h-56 flex items-center justify-center"
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              exit={{ scale: 0, rotate: 180 }}
-              transition={{ duration: 0.5, type: "spring", stiffness: 260, damping: 20 }}
-            >
-              <div className="relative w-full h-full">
-                {[
-                  { to: "/", icon: FaHome, label: "Home" },
-                  { to: "/admin-login", icon: FaUserShield, label: "Admin" },
-                  { href: "https://github.com/chesko21", icon: FaGithub, label: "GitHub" },
-                  ...(isAuthenticated ? [{ onClick: handleLogout, icon: FaSignOutAlt, label: "Logout" }] : []),
-                ].map((item, index) => (
-                  <motion.div
-                    key={item.label}
-                    className="absolute"
-                    style={{
-                      width: 50,
-                      height: 50,
-                      borderRadius: '50%',
-                      top: '50%',
-                      left: '50%',
-                      marginLeft: -25,
-                      marginTop: -25,
-                    }}
-                    initial={{ scale: 0, x: 0, y: 0 }}
-                    animate={{
-                      scale: 1,
-                      x: Math.cos(index * (2 * Math.PI / 4) - Math.PI / 2) * 70,
-                      y: Math.sin(index * (2 * Math.PI / 4) - Math.PI / 2) * 70,
-                    }}
-                    transition={{ duration: 0.5, delay: index * 0.1, type: "spring", stiffness: 260, damping: 20 }}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    {item.to ? (
-                      <Link
-                        to={item.to}
-                        className="w-full h-full flex flex-col items-center justify-center bg-gray-700 rounded-full text-white hover:bg-purple-600 transition-colors duration-300"
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        <motion.div
-                          initial={{ rotate: 0 }}
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 0.5 }}
-                        >
-                          <item.icon className="text-xl mb-1" />
-                        </motion.div>
-                        <span className="text-[0.6rem]">{item.label}</span>
-                      </Link>
-                    ) : item.href ? (
-                      <a
-                        href={item.href}
-                        className="w-full h-full flex flex-col items-center justify-center bg-gray-700 rounded-full text-white hover:bg-green-600 transition-colors duration-300"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        <motion.div
-                          initial={{ rotate: 0 }}
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 0.5 }}
-                        >
-                          <item.icon className="text-xl mb-1" />
-                        </motion.div>
-                        <span className="text-[0.6rem]">{item.label}</span>
-                      </a>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          item.onClick();
-                          setMenuOpen(false);
-                        }}
-                        className="w-full h-full flex flex-col items-center justify-center bg-gray-700 rounded-full text-white hover:bg-red-600 transition-colors duration-300"
-                        aria-label={item.label}
-                      >
-                        <motion.div
-                          initial={{ rotate: 0 }}
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 0.5 }}
-                        >
-                          <item.icon className="text-xl mb-1" />
-                        </motion.div>
-                        <span className="text-[0.6rem]">{item.label}</span>
-                      </button>
-                    )}
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          </motion.div>
+            className="md:hidden fixed inset-0 z-[90] bg-black/40 backdrop-blur-sm pointer-events-none"
+          />
         )}
       </AnimatePresence>
-    </header>
+    </>
   );
 };
 

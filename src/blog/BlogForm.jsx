@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import supabase from '../lib/supabaseClient';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
+import { FaSave, FaArrowLeft, FaImage, FaTerminal } from 'react-icons/fa';
 
 const BlogForm = () => {
   const navigate = useNavigate();
@@ -48,156 +49,19 @@ const BlogForm = () => {
       quillInstance.current = new Quill(quillRef.current, {
         theme: 'snow',
         modules: {
-          imageResize: {
-            displaySize: true,
-            modules: ['Resize', 'DisplaySize', 'Toolbar'],
-          },
-          toolbar: {
-            container: [
-              [{ header: [1, 2, 3, 4, 5, 6, false] }],
-              ['bold', 'italic', 'underline', 'strike'],
-              [{ list: 'ordered' }, { list: 'bullet' }],
-              [{ color: [] }, { background: [] }],
-              ['link', 'image'],
-              [{ align: [] }],
-              ['code-block'],
-              ['clean'],
-            ],
-            handlers: {
-              image: function () {
-                const input = document.createElement('input');
-                input.setAttribute('type', 'file');
-                input.setAttribute('accept', 'image/*');
-                input.click();
-
-                input.onchange = async () => {
-                  const file = input.files[0];
-                  const reader = new FileReader();
-                  reader.onloadend = () => {
-                    const imageUrl = reader.result;
-                    localStorage.setItem(`image-${Date.now()}`, imageUrl);
-                    const range = quillInstance.current.getSelection();
-                    const img = document.createElement('img');
-                    img.src = imageUrl;
-                    img.style.maxWidth = '50%';
-                    img.classList.add('resizable-image');
-                    img.onclick = function () {
-                      if (img.style.maxWidth === '50%') {
-                        img.style.maxWidth = '50%';
-                      } else {
-                        img.style.maxWidth = '50%';
-                      }
-                    };
-                    quillInstance.current.insertEmbed(range.index, 'image', imageUrl);
-                  };
-                  reader.readAsDataURL(file);
-                };
-              },
-            },
-          },
+          toolbar: [
+            [{ header: [1, 2, 3, false] }],
+            ['bold', 'italic', 'underline'],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            ['link', 'image', 'code-block'],
+            ['clean'],
+          ],
         },
       });
 
       quillInstance.current.on('text-change', () => {
         setContent(quillInstance.current.root.innerHTML);
       });
-
-      const toolbar = document.querySelector('.ql-toolbar');
-      if (toolbar) {
-        let isDragging = false;
-        let startX, startY;
-
-        toolbar.style.position = 'fixed';
-        toolbar.style.cursor = 'move';
-        toolbar.style.zIndex = '1000';
-        toolbar.style.backgroundColor = '#9ca3af';
-        toolbar.style.color = '#ffffff';
-        toolbar.style.padding = '5px';
-        toolbar.style.borderRadius = '3px';
-        toolbar.style.boxShadow = '0 1px 5px rgba(0,0,0,0.1)';
-        toolbar.style.fontSize = '10px';
-
-        toolbar.style.top = '50%';
-        toolbar.style.left = '50%';
-        toolbar.style.transform = 'translate(-50%, -50%)';
-
-        const updateToolbarPosition = () => {
-          const rect = toolbar.getBoundingClientRect();
-          const maxX = window.innerWidth - rect.width;
-          const maxY = window.innerHeight - rect.height;
-
-          let left = parseInt(toolbar.style.left) || maxX / 2;
-          let top = parseInt(toolbar.style.top) || maxY / 2;
-
-          left = Math.max(0, Math.min(left, maxX));
-          top = Math.max(0, Math.min(top, maxY));
-
-          toolbar.style.left = `${left}px`;
-          toolbar.style.top = `${top}px`;
-        };
-
-        const dragStart = (e) => {
-          isDragging = true;
-          startX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
-          startY = e.type === 'mousedown' ? e.clientY : e.touches[0].clientY;
-          startX -= toolbar.offsetLeft;
-          startY -= toolbar.offsetTop;
-          e.preventDefault();
-        };
-
-        const dragMove = (e) => {
-          if (isDragging) {
-            const clientX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
-            const clientY = e.type === 'mousemove' ? e.clientY : e.touches[0].clientY;
-            const newX = clientX - startX;
-            const newY = clientY - startY;
-            toolbar.style.left = `${newX}px`;
-            toolbar.style.top = `${newY}px`;
-            toolbar.style.transform = 'none';
-            updateToolbarPosition();
-          }
-        };
-
-        const dragEnd = () => {
-          isDragging = false;
-        };
-
-        toolbar.addEventListener('mousedown', dragStart);
-        document.addEventListener('mousemove', dragMove);
-        document.addEventListener('mouseup', dragEnd);
-
-        toolbar.addEventListener('touchstart', dragStart);
-        document.addEventListener('touchmove', dragMove);
-        document.addEventListener('touchend', dragEnd);
-
-        window.addEventListener('resize', updateToolbarPosition);
-
-        const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        const setColorScheme = (isDark) => {
-          document.documentElement.style.setProperty('--toolbar-bg-color', '#9ca3af');
-          document.documentElement.style.setProperty('--toolbar-text-color', '#ffffff');
-        };
-
-        setColorScheme(darkModeMediaQuery.matches);
-        darkModeMediaQuery.addListener((e) => setColorScheme(e.matches));
-
-        const buttons = toolbar.querySelectorAll('button');
-        buttons.forEach((button) => {
-          button.style.width = '20px';
-          button.style.height = '20px';
-          button.style.padding = '2px';
-          button.style.minWidth = 'unset';
-          button.style.color = '#ffffff';
-        });
-
-        const selects = toolbar.querySelectorAll('select');
-        selects.forEach((select) => {
-          select.style.height = '20px';
-          select.style.padding = '0 2px';
-          select.style.fontSize = '12px';
-          select.style.color = '#ffffff';
-        });
-      }
     }
   }, []);
 
@@ -214,6 +78,7 @@ const BlogForm = () => {
     e.preventDefault();
     if (isSubmitting) return;
     setIsSubmitting(true);
+    setMessage('UPLOADING_DATA...');
 
     const content = quillInstance.current.root.innerHTML;
     let imageUrl = imagePreview;
@@ -229,7 +94,7 @@ const BlogForm = () => {
 
       if (uploadError) {
         console.error('Error uploading image:', uploadError);
-        setMessage('Error uploading image. Please try again.');
+        setMessage('ERROR: Upload failed');
         setIsSubmitting(false);
         return;
       }
@@ -240,126 +105,158 @@ const BlogForm = () => {
     const postPayload = { title, content, author, description };
     if (imageUrl) postPayload.image_url = imageUrl;
 
-    const { data, error } = postId
+    const { error } = postId
       ? await supabase.from('blog_posts').update(postPayload).eq('id', postId)
       : await supabase.from('blog_posts').insert([postPayload]);
 
     if (error) {
       console.error('Error saving post:', error);
-      setMessage('Error saving post. Please try again.');
+      setMessage('ERROR: Save failed');
       setIsSubmitting(false);
     } else {
-      setMessage('Post saved successfully!');
-      setTimeout(() => navigate('/blog-home'), 2000);
+      setMessage('SUCCESS: Record saved');
+      setTimeout(() => navigate('/blog-home'), 1500);
     }
   };
 
   return (
-    <div className="relative mt-4 p-4 max-w-xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-      <h2 className="text-xl font-bold text-gray-900 dark:text-yellow-500 mb-4">
-        {postId ? 'Edit Blog Post' : 'Create a New Blog Post'}
-      </h2>
-      {message && <p className={`text-xs ${message.includes('Error') ? 'text-red-500' : 'text-green-500'}`}>{message}</p>}
-      <motion.form
-        onSubmit={handleSubmit}
-        className="space-y-3"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Title</label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="mt-1 p-1.5 text-sm block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700"
-            required
-          />
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Author</label>
-          <input
-            type="text"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-            className="mt-1 p-1.5 text-sm block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700"
-            required
-          />
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Description</label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="mt-1 p-1.5 text-sm block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 resize-y text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700"
-            required
-          />
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <label className="block text-xs mb-6 font-medium text-gray-700 dark:text-gray-300">Content</label>
-          <div className="relative">
-            <div 
-              ref={quillRef} 
-              className="border border-gray-300 rounded-md text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700"
-              style={{ maxHeight: '200px', overflowY: 'auto' }}
-            />
+    <motion.div 
+      className="min-h-screen bg-black text-white font-mono py-20"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+    >
+      <div className="container mx-auto px-6 max-w-4xl">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-12 border-b border-white/5 pb-8">
+          <div className="flex items-center space-x-4">
+            <FaTerminal className="text-cyber-primary" />
+            <h1 className="text-3xl font-black tracking-tighter uppercase italic">
+              {postId ? 'EDIT_RECORD' : 'NEW_RECORD'}
+            </h1>
           </div>
-        </motion.div>
+          <Link to="/blog-home">
+            <button className="flex items-center text-[10px] text-gray-500 hover:text-white transition-colors uppercase tracking-widest">
+              <FaArrowLeft className="mr-2" /> Back_To_Console
+            </button>
+          </Link>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-        >
-          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Image Cover</label>
-          <input
-            type="file"
-            onChange={handleImageChange}
-            className="mt-1 text-xs block w-full border border-gray-300 rounded-md shadow-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700"
-          />
-          {imagePreview && (
-            <img src={imagePreview} alt="Image preview" className="mt-3 w-32 h-auto rounded-md shadow-sm" />
-          )}
-        </motion.div>
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Left Column: Metadata */}
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] text-cyber-primary uppercase tracking-widest">Title_String</label>
+                <input
+                  type="text"
+                  className="w-full bg-black/40 border border-white/10 p-4 text-sm text-white focus:outline-none focus:border-cyber-primary transition-all"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Enter title..."
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] text-cyber-primary uppercase tracking-widest">Author_ID</label>
+                <input
+                  type="text"
+                  className="w-full bg-black/40 border border-white/10 p-4 text-sm text-white focus:outline-none focus:border-cyber-primary transition-all"
+                  value={author}
+                  onChange={(e) => setAuthor(e.target.value)}
+                  placeholder="Enter author name..."
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] text-cyber-primary uppercase tracking-widest">Abstract_Description</label>
+                <textarea
+                  className="w-full bg-black/40 border border-white/10 p-4 text-sm text-white h-32 focus:outline-none focus:border-cyber-primary transition-all resize-none"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Brief summary..."
+                  required
+                />
+              </div>
+            </div>
 
-        <motion.button
-          type="submit"
-          className={`px-3 py-1.5 text-sm text-white rounded ${isSubmitting ? 'bg-gray-500' : 'bg-blue-500 hover:bg-blue-600'}`}
-          disabled={isSubmitting}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
-        >
-          {isSubmitting ? 'Submitting...' : (postId ? 'Update Post' : 'Create Post')}
-        </motion.button>
-      </motion.form>
-      <button
-        onClick={() => navigate('/blog-home')}
-        className="fixed bottom-3 left-3 bg-blue-500 text-white text-xs rounded-full px-3 py-1.5 shadow-lg hover:bg-blue-600 transition-colors duration-300"
-      >
-        Back
-      </button>
-    </div>
+            {/* Right Column: Visuals */}
+            <div className="space-y-6">
+              <label className="text-[10px] text-cyber-primary uppercase tracking-widest block">Visual_Asset</label>
+              <div className="relative group border-2 border-dashed border-white/10 hover:border-cyber-primary/50 transition-all p-4 flex flex-col items-center justify-center h-[280px]">
+                {imagePreview ? (
+                  <img src={imagePreview} className="w-full h-full object-cover opacity-60" alt="Preview" />
+                ) : (
+                  <div className="text-center space-y-4">
+                    <FaImage className="mx-auto text-gray-700" size={40} />
+                    <p className="text-[10px] text-gray-600 uppercase tracking-widest">No_Asset_Loaded</p>
+                  </div>
+                )}
+                <input
+                  type="file"
+                  onChange={handleImageChange}
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                  accept="image/*"
+                />
+                <div className="absolute bottom-4 right-4 bg-black/80 p-2 text-[8px] text-cyber-primary uppercase tracking-widest border border-cyber-primary/20">
+                  Click_To_Upload
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Editor Section */}
+          <div className="space-y-2">
+            <label className="text-[10px] text-cyber-primary uppercase tracking-widest">Core_Content_Data</label>
+            <div className="bg-white/5 border border-white/10 rounded-none overflow-hidden">
+              <div ref={quillRef} className="h-96 text-white border-none" />
+            </div>
+          </div>
+
+          {/* Action Footer */}
+          <div className="flex items-center justify-between border-t border-white/5 pt-12">
+            <div className="text-[10px] text-cyber-primary animate-pulse tracking-[0.2em]">
+              {message}
+            </div>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-12 py-4 bg-transparent border border-cyber-primary text-cyber-primary font-bold uppercase tracking-widest hover:bg-cyber-primary hover:text-black transition-all duration-500 flex items-center group relative overflow-hidden"
+            >
+              <span className="relative z-10 flex items-center">
+                <FaSave className="mr-3" /> Commit_Changes
+              </span>
+              <div className="absolute inset-0 bg-cyber-primary translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <style>{`
+        .ql-toolbar.ql-snow {
+          background: #111 !important;
+          border: 1px solid rgba(255,255,255,0.1) !important;
+          border-bottom: none !important;
+        }
+        .ql-container.ql-snow {
+          border: 1px solid rgba(255,255,255,0.1) !important;
+          background: rgba(0,0,0,0.4) !important;
+        }
+        .ql-snow .ql-stroke {
+          stroke: #999 !important;
+        }
+        .ql-snow .ql-fill {
+          fill: #999 !important;
+        }
+        .ql-snow .ql-picker {
+          color: #999 !important;
+        }
+        .ql-editor {
+          font-family: 'JetBrains Mono', monospace !important;
+          font-size: 14px !important;
+          line-height: 1.6 !important;
+        }
+      `}</style>
+    </motion.div>
   );
 };
 

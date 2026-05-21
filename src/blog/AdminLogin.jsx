@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaLock, FaUser } from 'react-icons/fa';
 
 const AdminLogin = ({ setLoggedIn }) => {
   const [username, setUsername] = useState('');
@@ -28,7 +28,7 @@ const AdminLogin = ({ setLoggedIn }) => {
       setLoggedIn(true);
       navigate('/blog-home');
     } else {
-      setError('Invalid username or password');
+      setError('ACCESS_DENIED: Invalid Credentials');
     }
   };
 
@@ -40,52 +40,77 @@ const AdminLogin = ({ setLoggedIn }) => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen px-4">
+    <div className="relative flex justify-center items-center min-h-screen px-4 bg-black overflow-hidden font-mono">
+      {/* Cinematic Background Layer */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black z-10"></div>
+        <img
+          src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop"
+          alt="Login Background"
+          className="w-full h-full object-cover opacity-30"
+        />
+        <div className="absolute inset-0 cyber-grid opacity-20"></div>
+      </div>
+
       <motion.div
-        className="w-full max-w-sm p-6 space-y-4 rounded-lg bg-white dark:bg-gray-800 shadow-lg"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        className="relative z-20 w-full max-w-md p-8 glassmorphism rounded-none border border-cyber-primary/30 shadow-[0_0_50px_rgba(0,0,0,0.5)]"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8, ease: "circOut" }}
       >
+        {/* Decorative Corners */}
+        <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-cyber-primary"></div>
+        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-cyber-purple"></div>
+
         {isAuthenticated ? (
-          <button
-            onClick={handleLogout}
-            className="w-full py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors duration-300 text-sm"
-          >
-            Logout
-          </button>
+          <div className="text-center space-y-6">
+            <h1 className="text-2xl font-black text-white tracking-widest uppercase italic">SESSION_ACTIVE</h1>
+            <p className="text-gray-400 text-sm">Identity confirmed. Access granted to core modules.</p>
+            <button
+              onClick={handleLogout}
+              className="w-full py-4 bg-transparent border border-red-500/50 text-red-500 font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all duration-300"
+            >
+              TERMINATE_SESSION
+            </button>
+          </div>
         ) : (
           <>
-            <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-yellow-500 mb-4">Admin Login</h1>
-            <form onSubmit={handleLogin} className="space-y-3">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-              >
-                <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
-                <input
-                  type="text"
-                  id="username"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus:ring-blue-500 focus:border-blue-500"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                />
-              </motion.div>
+            <div className="text-center mb-10">
+              <h1 className="text-3xl font-black text-white tracking-tighter uppercase italic mb-2">ADMIN_SEC</h1>
+              <div className="flex items-center justify-center space-x-2">
+                <span className="w-2 h-2 bg-cyber-primary animate-pulse"></span>
+                <p className="text-[10px] text-gray-500 uppercase tracking-[0.4em]">Restricted Data Access</p>
+              </div>
+            </div>
 
-              <motion.div
-                className="relative"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
-                <div className="relative">
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] text-cyber-primary uppercase tracking-widest ml-1">IDENTIFIER</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-cyber-primary transition-colors">
+                    <FaUser size={14} />
+                  </div>
+                  <input
+                    type="text"
+                    className="w-full pl-12 pr-4 py-4 bg-black/40 border border-white/10 rounded-none text-white focus:outline-none focus:border-cyber-primary focus:ring-1 focus:ring-cyber-primary/50 transition-all placeholder:text-gray-700"
+                    placeholder="ENTER_ID"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] text-cyber-primary uppercase tracking-widest ml-1">SECURITY_CODE</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-cyber-primary transition-colors">
+                    <FaLock size={14} />
+                  </div>
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    id="password"
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full pl-12 pr-12 py-4 bg-black/40 border border-white/10 rounded-none text-white focus:outline-none focus:border-cyber-primary focus:ring-1 focus:ring-cyber-primary/50 transition-all placeholder:text-gray-700"
+                    placeholder="ENTER_PASS"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -93,34 +118,35 @@ const AdminLogin = ({ setLoggedIn }) => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 flex items-center px-3"
+                    className="absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 hover:text-white transition-colors"
                   >
-                    {showPassword ? <FaEyeSlash className="text-gray-500 dark:text-gray-400" /> : <FaEye className="text-gray-500 dark:text-gray-400" />}
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
-              </motion.div>
+              </div>
 
               {error && (
-                <motion.p
-                  className="text-red-500 text-xs"
+                <motion.div
+                  className="p-3 bg-red-500/10 border border-red-500/50 text-red-500 text-[10px] text-center uppercase tracking-widest animate-pulse"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5, delay: 0.3 }}
                 >
                   {error}
-                </motion.p>
+                </motion.div>
               )}
 
-              <motion.button
+              <button
                 type="submit"
-                className="w-full py-2 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600 transition-colors duration-300"
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ duration: 0.2 }}
+                className="w-full py-4 bg-transparent border border-cyber-primary text-cyber-primary font-bold uppercase tracking-widest hover:bg-cyber-primary hover:text-black transition-all duration-500 group relative overflow-hidden"
               >
-                Login
-              </motion.button>
+                <span className="relative z-10">INITIALIZE_LOGIN</span>
+                <div className="absolute inset-0 bg-cyber-primary translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+              </button>
             </form>
+
+            <div className="mt-8 text-center">
+              <p className="text-[8px] text-gray-600 uppercase tracking-[0.5em]">System_v1.0.4_Protected</p>
+            </div>
           </>
         )}
       </motion.div>

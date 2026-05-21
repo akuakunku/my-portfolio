@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import supabase from '../lib/supabaseClient';
 import DOMPurify from 'dompurify';
-import { FaPlus, FaEdit, FaTrash, FaCalendarAlt, FaUser, FaChevronUp, FaEye } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaCalendarAlt, FaUser, FaChevronUp, FaEye, FaTerminal, FaDatabase } from 'react-icons/fa';
 
 const BlogHome = () => {
   const [posts, setPosts] = useState([]);
@@ -39,7 +39,7 @@ const BlogHome = () => {
     try {
       if (imageUrl) {
         const { error: deleteError } = await supabase.storage
-          .from('your-bucket-name')
+          .from('blog_posts')
           .remove([imageUrl.split('/').pop()]);
         if (deleteError) {
           console.error('Error deleting image:', deleteError);
@@ -59,7 +59,7 @@ const BlogHome = () => {
   };
 
   const confirmDelete = (id, imageUrl) => {
-    const confirmed = window.confirm('Are you sure you want to delete this post?');
+    const confirmed = window.confirm('ALERT: Data purge requested. Confirm deletion of record?');
     if (confirmed) {
       handleDelete(id, imageUrl);
     }
@@ -77,7 +77,7 @@ const BlogHome = () => {
   const cleanContent = (content) => DOMPurify.sanitize(content);
 
   const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
@@ -90,126 +90,163 @@ const BlogHome = () => {
 
   return (
     <motion.div 
-      className="min-h-screen mb-4 p-2 rounded-lg bg-gradient-to-br from-purple-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-900"
+      className="min-h-screen bg-black text-white font-mono pb-20"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="container mx-auto">
+      <div className="container mx-auto px-6">
+        {/* Header Section */}
         <motion.div 
-          className="flex flex-col sm:flex-row justify-between items-center py-8"
-          initial={{ y: -50, opacity: 0 }}
+          className="flex flex-col md:flex-row justify-between items-center py-12 border-b border-white/5"
+          initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
+          transition={{ delay: 0.2 }}
         >
-          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600 mb-4 sm:mb-0">Blog Management</h1>
+          <div className="mb-8 md:mb-0">
+            <div className="flex items-center space-x-3 mb-2">
+              <FaTerminal className="text-cyber-primary" />
+              <h1 className="text-4xl font-black tracking-tighter uppercase italic">CONTENT_MGMT</h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <span className="text-[10px] text-gray-500 uppercase tracking-[0.4em]">Database_Active</span>
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            </div>
+          </div>
+
           <Link to="/blog-form">
             <motion.button
-              whileHover={{ scale: 1.05, boxShadow: "0px 0px 8px rgb(167, 139, 250)" }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg shadow-md transition-all duration-300 text-sm flex items-center"
+              className="px-8 py-4 bg-transparent border border-cyber-primary text-cyber-primary font-bold uppercase tracking-widest hover:bg-cyber-primary hover:text-black transition-all duration-300 flex items-center group overflow-hidden relative"
             >
-              <FaPlus className="mr-2" /> Create Post
+              <span className="relative z-10 flex items-center">
+                <FaPlus className="mr-3" /> Create_New_Record
+              </span>
+              <div className="absolute inset-0 bg-cyber-primary translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
             </motion.button>
           </Link>
         </motion.div>
+
+        {/* Dashboard Stats (Optional/Visual) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-12">
+          <div className="glassmorphism p-6 border border-white/5">
+            <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-2">Total_Records</p>
+            <div className="flex items-end space-x-3">
+              <span className="text-3xl font-black text-white">{posts.length.toString().padStart(2, '0')}</span>
+              <FaDatabase className="text-cyber-primary mb-1" size={12} />
+            </div>
+          </div>
+          <div className="glassmorphism p-6 border border-white/5">
+            <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-2">System_Status</p>
+            <span className="text-xs font-bold text-green-500 uppercase">Stable_v1.0.4</span>
+          </div>
+          <div className="glassmorphism p-6 border border-white/5">
+            <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-2">Last_Access</p>
+            <span className="text-xs font-bold text-cyber-primary uppercase">{new Date().toLocaleTimeString()}</span>
+          </div>
+        </div>
+
+        {/* Records Grid */}
         <AnimatePresence>
           {isLoading ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex justify-center items-center h-64"
+              className="flex flex-col justify-center items-center h-64 space-y-4"
             >
-              <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-32 w-32 animate-spin"></div>
+              <div className="w-12 h-12 border-2 border-cyber-primary border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-[10px] text-cyber-primary uppercase tracking-[0.5em]">Synchronizing...</span>
             </motion.div>
           ) : (
-            <motion.ul
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+            <motion.div
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
             >
               {posts.map((post, index) => (
-                <motion.li
+                <motion.div
                   key={post.id}
-                  className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
-                  initial={{ opacity: 0, y: 50 }}
+                  className="group relative glassmorphism border border-white/5 overflow-hidden transition-all duration-500 hover:border-cyber-primary/30"
+                  initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -50 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  transition={{ delay: index * 0.1 }}
                 >
-                  <div className="relative pb-2/3 group">
+                  <div className="relative h-48 overflow-hidden">
                     <img
-                      src={post.image_url || 'https://via.placeholder.com/300x200'}
+                      src={post.image_url || 'https://via.placeholder.com/600x400'}
                       alt={post.title}
-                      className="absolute h-full w-full object-cover transition-transform duration-300 transform group-hover:scale-110"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0"
                     />
-                    <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                      <Link
-                        to={`/blog-post/${post.id}`}
-                        className="text-white text-lg font-semibold flex items-center"
-                      >
-                        <FaEye className="mr-2" /> View Post
-                      </Link>
+                    <div className="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-colors duration-500"></div>
+                    <div className="absolute top-4 right-4 z-20">
+                      <span className="px-3 py-1 bg-black/60 border border-white/10 text-[8px] text-white uppercase tracking-widest">
+                        Node_{index.toString().padStart(2, '0')}
+                      </span>
                     </div>
                   </div>
-                  <div className="p-6">
-                    <h2 className="text-2xl font-semibold text-gray-900 dark:text-yellow-400 mb-3">
-                      {truncateTitle(post.title, 50)}
+
+                  <div className="p-8">
+                    <h2 className="text-xl font-bold text-white mb-4 tracking-tighter uppercase line-clamp-1 group-hover:text-cyber-primary transition-colors">
+                      {post.title}
                     </h2>
-                    <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-3">
-                      <FaUser className="mr-2" />
-                      <span className="font-medium">{post.author || 'Anonymous'}</span>
-                      <FaCalendarAlt className="ml-4 mr-2" />
-                      <span>{formatDate(post.created_at)}</span>
+                    
+                    <div className="flex items-center text-[10px] text-gray-500 mb-6 space-x-6">
+                      <div className="flex items-center">
+                        <FaUser className="mr-2 text-cyber-primary" size={10} />
+                        <span>{post.author || 'ROOT'}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <FaCalendarAlt className="mr-2 text-cyber-primary" size={10} />
+                        <span>{formatDate(post.created_at)}</span>
+                      </div>
                     </div>
-                    <p className="text-gray-700 dark:text-gray-300 mb-4 text-sm leading-relaxed">
-                      {cleanContent(truncateText(post.description, 20))}
+
+                    <p className="text-gray-400 text-xs leading-relaxed mb-8 line-clamp-2 font-light">
+                      {cleanContent(truncateText(post.description || '', 100))}
                     </p>
-                    <div className="flex justify-between items-center mt-4">
+
+                    <div className="flex justify-between items-center border-t border-white/5 pt-6">
                       <Link
                         to={`/blog-post/${post.id}`}
-                        className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-200 text-sm font-medium transition-colors duration-300"
+                        className="text-[10px] font-bold text-cyber-primary uppercase tracking-widest hover:text-white transition-colors flex items-center"
                       >
-                        Read more
+                        <FaEye className="mr-2" /> View_Data
                       </Link>
-                      <div className="flex space-x-2">
-                        <motion.button
-                          whileHover={{ scale: 1.1, rotate: 15 }}
-                          whileTap={{ scale: 0.9 }}
+                      
+                      <div className="flex space-x-4">
+                        <button
                           onClick={() => navigate(`/blog-form?id=${post.id}`)}
-                          className="p-2 bg-yellow-500 text-white rounded-full hover:bg-yellow-600 transition-colors duration-300"
+                          className="p-2 text-gray-500 hover:text-cyber-primary transition-colors"
                         >
-                          <FaEdit />
-                        </motion.button>
-                        <motion.button
-                          whileHover={{ scale: 1.1, rotate: -15 }}
-                          whileTap={{ scale: 0.9 }}
+                          <FaEdit size={14} />
+                        </button>
+                        <button
                           onClick={() => confirmDelete(post.id, post.image_url)}
-                          className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-300"
+                          className="p-2 text-gray-500 hover:text-red-500 transition-colors"
                         >
-                          <FaTrash />
-                        </motion.button>
+                          <FaTrash size={14} />
+                        </button>
                       </div>
                     </div>
                   </div>
-                </motion.li>
+                </motion.div>
               ))}
-            </motion.ul>
+            </motion.div>
           )}
         </AnimatePresence>
       </div>
+
       <AnimatePresence>
         {showScrollTop && (
           <motion.button
-            className="fixed bottom-8 right-8 p-4 bg-purple-600 text-white rounded-full shadow-lg"
+            className="fixed bottom-12 right-12 p-4 bg-cyber-primary text-black rounded-none shadow-[0_0_20px_rgba(0,102,255,0.3)] z-50"
             onClick={scrollToTop}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
           >
             <FaChevronUp />
           </motion.button>

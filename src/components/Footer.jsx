@@ -21,40 +21,40 @@ const Footer = () => {
           </span>
         </div>
         
-        <div className="grid grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
           <div className="flex flex-col space-y-2">
             <span className="font-mono text-[8px] text-gray-600 uppercase tracking-[0.4em] mb-4 border-b border-white/5 pb-2">Navigation</span>
-            <a href="/" className="font-mono text-[10px] uppercase tracking-widest text-gray-400 hover:text-cyber-blue transition-colors flex items-center group">
+            <a href="/" className="font-mono text-[10px] uppercase tracking-widest text-gray-400 hover:text-cyber-blue transition-colors flex items-center group py-1">
               <span className="w-1 h-1 bg-cyber-blue mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></span>
               Home
             </a>
-            <a href="#portfolio" className="font-mono text-[10px] uppercase tracking-widest text-gray-400 hover:text-cyber-blue transition-colors flex items-center group">
+            <a href="#portfolio" className="font-mono text-[10px] uppercase tracking-widest text-gray-400 hover:text-cyber-blue transition-colors flex items-center group py-1">
               <span className="w-1 h-1 bg-cyber-blue mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></span>
               Projects
             </a>
           </div>
           <div className="flex flex-col space-y-2">
             <span className="font-mono text-[8px] text-gray-600 uppercase tracking-[0.4em] mb-4 border-b border-white/5 pb-2">Social_Links</span>
-            <a href="https://github.com/chesko21" target="_blank" rel="noopener noreferrer" className="font-mono text-[10px] uppercase tracking-widest text-gray-400 hover:text-cyber-blue transition-colors flex items-center group">
+            <a href="https://github.com/chesko21" target="_blank" rel="noopener noreferrer" className="font-mono text-[10px] uppercase tracking-widest text-gray-400 hover:text-cyber-blue transition-colors flex items-center group py-1">
               <span className="w-1 h-1 bg-cyber-blue mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></span>
               GitHub
             </a>
-            <a href="https://instagram.com/chesko_afiq" target="_blank" rel="noopener noreferrer" className="font-mono text-[10px] uppercase tracking-widest text-gray-400 hover:text-cyber-blue transition-colors flex items-center group">
+            <a href="https://instagram.com/chesko_afiq" target="_blank" rel="noopener noreferrer" className="font-mono text-[10px] uppercase tracking-widest text-gray-400 hover:text-cyber-blue transition-colors flex items-center group py-1">
               <span className="w-1 h-1 bg-cyber-blue mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></span>
               Instagram
             </a>
-            <a href="https://threads.net/@chesko_afiq" target="_blank" rel="noopener noreferrer" className="font-mono text-[10px] uppercase tracking-widest text-gray-400 hover:text-cyber-blue transition-colors flex items-center group">
+            <a href="https://threads.net/@chesko_afiq" target="_blank" rel="noopener noreferrer" className="font-mono text-[10px] uppercase tracking-widest text-gray-400 hover:text-cyber-blue transition-colors flex items-center group py-1">
               <span className="w-1 h-1 bg-cyber-blue mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></span>
               Threads
             </a>
-            <a href="https://tiktok.com/@afiq_chesko1" target="_blank" rel="noopener noreferrer" className="font-mono text-[10px] uppercase tracking-widest text-gray-400 hover:text-cyber-blue transition-colors flex items-center group">
+            <a href="https://tiktok.com/@afiq_chesko1" target="_blank" rel="noopener noreferrer" className="font-mono text-[10px] uppercase tracking-widest text-gray-400 hover:text-cyber-blue transition-colors flex items-center group py-1">
               <span className="w-1 h-1 bg-cyber-blue mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></span>
               TikTok
             </a>
           </div>
         </div>
 
-        <div className="flex flex-col items-end justify-between text-right">
+        <div className="flex flex-col items-center md:items-end justify-between text-center md:text-right space-y-6 md:space-y-0">
           <div className="font-mono text-[8px] text-gray-600 uppercase tracking-[0.4em] bg-white/5 px-3 py-1 rounded-full border border-white/10">
             SYNC_TIME: {new Date().toLocaleTimeString()}
           </div>

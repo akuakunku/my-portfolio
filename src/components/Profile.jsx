@@ -190,30 +190,30 @@ const Profile = () => {
         </div>
       </div>
 
-      <div ref={containerRef} className="relative z-30 text-center px-4 max-w-6xl mx-auto">
+      <div ref={containerRef} className="relative z-30 text-center px-4 max-w-6xl mx-auto w-full">
         <h1 
           ref={titleRef}
-          className="text-[12vw] md:text-[15vw] font-black tracking-tighter mb-4 leading-none flex justify-center overflow-visible py-4"
+          className="text-[15vw] md:text-[15vw] font-black tracking-tighter mb-4 leading-none flex justify-center overflow-visible py-4"
         >
           {name.split("").map((char, i) => (
-            <span key={i} className="title-char inline-block px-1 cyber-text-gradient">{char}</span>
+            <span key={i} className="title-char inline-block px-0.5 md:px-1 cyber-text-gradient">{char}</span>
           ))}
         </h1>
 
         <div 
           ref={subtitleRef}
-          className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-12 text-gray-500 mb-12"
+          className="flex flex-wrap items-center justify-center gap-3 md:gap-12 text-gray-500 mb-8 md:mb-12"
         >
           {["Web Developer", "UI/UX Designer", "JS Specialist"].map((text, i) => (
-            <div key={i} className="subtitle-line flex items-center space-x-4">
-              <span className="w-1 h-1 bg-cyber-primary rotate-45"></span>
-              <span className="font-mono tracking-[0.4em] uppercase text-[10px] md:text-xs text-white/80">{text}</span>
+            <div key={i} className="subtitle-line flex items-center space-x-2 md:space-x-4">
+              <span className="w-1 h-1 bg-cyber-primary rotate-45 shrink-0"></span>
+              <span className="font-mono tracking-[0.2em] md:tracking-[0.4em] uppercase text-[8px] md:text-xs text-white/80 whitespace-nowrap">{text}</span>
             </div>
           ))}
         </div>
         
-        <div className="profile-desc max-w-xl mx-auto border-t border-white/5 pt-12">
-          <p className="text-gray-500 text-[10px] md:text-xs leading-loose font-mono uppercase tracking-[0.2em]">
+        <div className="profile-desc max-w-xl mx-auto border-t border-white/5 pt-8 md:pt-12 px-2">
+          <p className="text-gray-500 text-[8px] md:text-xs leading-relaxed md:leading-loose font-mono uppercase tracking-[0.1em] md:tracking-[0.2em]">
             Specializing in high-performance digital experiences. 
             Merging aesthetic precision with technical excellence to build the next generation of web interfaces.
           </p>

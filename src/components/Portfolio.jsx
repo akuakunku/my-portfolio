@@ -151,14 +151,14 @@ const Portfolio = () => {
       </div>
 
       {/* Asymmetric Grid Layout */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[250px] md:auto-rows-[300px]">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 auto-rows-[280px] md:auto-rows-[300px]">
         {projects.map((project) => (
           <div 
             key={project.id} 
             className={`project-card glassmorphism group border border-white/5 hover:border-cyber-blue/30 transition-all duration-500 overflow-hidden flex flex-col relative
-              ${project.size === 'large' ? 'md:col-span-2 md:row-span-2' : ''}
-              ${project.size === 'medium' ? 'md:col-span-1 md:row-span-2' : ''}
-              ${project.size === 'small' ? 'md:col-span-1 md:row-span-1' : ''}
+              ${project.size === 'large' ? 'sm:col-span-2 lg:col-span-2 lg:row-span-2' : ''}
+              ${project.size === 'medium' ? 'sm:col-span-1 lg:col-span-1 lg:row-span-2' : ''}
+              ${project.size === 'small' ? 'sm:col-span-1 lg:col-span-1 lg:row-span-1' : ''}
             `}
           >
             {/* Project Image Header */}

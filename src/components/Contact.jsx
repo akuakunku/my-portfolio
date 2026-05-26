@@ -64,7 +64,7 @@ const Contact = () => {
                 <input
                   type="text"
                   placeholder="ID_IDENTIFIER"
-                  className="w-full bg-cyber-dark/50 border border-cyber-blue/20 p-2 rounded-lg text-[10px] text-white focus:outline-none focus:border-cyber-blue focus:ring-1 focus:ring-cyber-blue/50 transition-all placeholder:text-gray-600"
+                  className="w-full bg-cyber-dark/50 border border-cyber-blue/20 p-2 rounded-lg text-[10px] text-white transition-premium focus:outline-none focus:border-cyber-blue focus:ring-2 focus:ring-cyber-blue/30 placeholder:text-gray-600"
                   name="from_name"
                   required
                 />
@@ -73,7 +73,7 @@ const Contact = () => {
                 <input
                   type="email"
                   placeholder="SIGNAL_ADDR"
-                  className="w-full bg-cyber-dark/50 border border-cyber-blue/20 p-2 rounded-lg text-[10px] text-white focus:outline-none focus:border-cyber-blue focus:ring-1 focus:ring-cyber-blue/50 transition-all placeholder:text-gray-600"
+                  className="w-full bg-cyber-dark/50 border border-cyber-blue/20 p-2 rounded-lg text-[10px] text-white transition-premium focus:outline-none focus:border-cyber-blue focus:ring-2 focus:ring-cyber-blue/30 placeholder:text-gray-600"
                   name="reply_to"
                   required
                 />

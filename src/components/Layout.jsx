@@ -14,12 +14,7 @@ const Layout = ({ children, isAuthenticated, handleLogout }) => {
     >
       <CustomCursor />
       <Header isAuthenticated={isAuthenticated} handleLogout={handleLogout} />
-      <motion.main 
-        className="flex-grow"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.5 }}
-      >
+      <motion.main className="flex-grow pb-24 md:pb-0">
         {children}
       </motion.main>
       <Footer />

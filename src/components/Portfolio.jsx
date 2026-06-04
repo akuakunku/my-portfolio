@@ -1,13 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ProjectCard } from './ui/ProjectCard';
+import { SectionReveal } from './layout/SectionReveal';
+import { cn } from '../lib/utils';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const Portfolio = () => {
   const containerRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [hoveredProject, setHoveredProject] = useState(null);
   const [expandedProject, setExpandedProject] = useState(null);
   
   const projects = [
@@ -181,41 +183,6 @@ const Portfolio = () => {
         }
       });
 
-      // Cards animation with stagger for mobile
-      const cards = gsap.utils.toArray(".project-card");
-      
-      cards.forEach((card, index) => {
-        gsap.from(card, {
-          y: isMobile ? 40 : 50,
-          opacity: 0,
-          scale: isMobile ? 0.95 : 1,
-          duration: isMobile ? 0.8 : 1,
-          delay: isMobile ? index * 0.05 : index * 0.08,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: card,
-            start: "top 90%",
-            toggleActions: "play none none none"
-          }
-        });
-      });
-
-      // Parallax effect for images on scroll
-      if (!isMobile) {
-        const images = gsap.utils.toArray(".project-image");
-        images.forEach((img) => {
-          gsap.to(img, {
-            y: 30,
-            scrollTrigger: {
-              trigger: img,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: 0.5
-            }
-          });
-        });
-      }
-
       // Floating animation for decorative elements
       gsap.to(".floating-line", {
         y: isMobile ? 10 : 15,
@@ -241,7 +208,7 @@ const Portfolio = () => {
   };
 
   return (
-    <section ref={containerRef} id="portfolio" className="bg-[#050505] text-white py-12 md:py-20 px-3 md:px-8 overflow-hidden">
+    <section ref={containerRef} className="section-py relative overflow-hidden bg-[#050505] text-white">
       {/* Animated Background Grid */}
       <div className="absolute inset-0 pointer-events-none opacity-5">
         <div className="absolute inset-0" style={{
@@ -255,9 +222,9 @@ const Portfolio = () => {
       </div>
 
       {/* Newspaper Header */}
-      <div className="max-w-7xl mx-auto mb-12 md:mb-16 border-b-4 border-cyber-blue/20 pb-6 md:pb-8 flex flex-col md:flex-row justify-between items-end gap-4 px-2 relative">
+      <SectionReveal className="section-container relative mb-12 flex flex-col items-end justify-between gap-6 border-b-4 border-cyber-blue/20 pb-8 md:mb-16 md:flex-row md:gap-4">
         <div className="w-full md:w-auto">
-          <h2 className="header-title text-3xl md:text-8xl font-black tracking-tighter uppercase cyber-text-gradient py-2 px-1 overflow-visible relative">
+          <h2 className="header-title overflow-visible px-1 py-2 text-3xl font-black uppercase tracking-tighter cyber-text-gradient md:text-7xl lg:text-8xl">
             PROJECT_ARCHIVES
             <div className="absolute -bottom-2 left-0 w-20 h-0.5 bg-cyber-blue/50 md:hidden"></div>
           </h2>
@@ -287,151 +254,30 @@ const Portfolio = () => {
             </div>
           </div>
         )}
-      </div>
+      </SectionReveal>
 
-      {/* Asymmetric Grid Layout */}
-      <div className={`max-w-7xl mx-auto grid gap-3 md:gap-6 ${
-        isMobile 
-          ? 'grid-cols-1 auto-rows-auto'
-          : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-[280px] md:auto-rows-[300px]'
-      }`}>
+      <div
+        className={cn(
+          'section-container grid gap-4 md:gap-6',
+          isMobile
+            ? 'grid-cols-1'
+            : 'grid-cols-1 auto-rows-[280px] sm:grid-cols-2 md:auto-rows-[300px] lg:grid-cols-3'
+        )}
+      >
         {projects.map((project, index) => (
-          <div 
-            key={project.id} 
-            className={`project-card glassmorphism border border-white/5 hover:border-cyber-blue/30 transition-all duration-500 overflow-hidden flex flex-col relative
-              ${!isMobile && project.size === 'large' ? 'sm:col-span-2 lg:col-span-2 lg:row-span-2' : ''}
-              ${!isMobile && project.size === 'medium' ? 'sm:col-span-1 lg:col-span-1 lg:row-span-2' : ''}
-              ${!isMobile && project.size === 'small' ? 'sm:col-span-1 lg:col-span-1 lg:row-span-1' : ''}
-              ${isMobile && expandedProject === project.id ? 'min-h-[400px]' : 'min-h-[280px]'}
-              ${isMobile ? 'cursor-pointer active:scale-[0.98] transition-transform duration-200' : ''}
-            `}
-            onClick={() => handleCardClick(project.id)}
-            onMouseEnter={() => !isMobile && setHoveredProject(project.id)}
-            onMouseLeave={() => !isMobile && setHoveredProject(null)}
-          >
-            {/* Project Image Header */}
-            <div className="absolute inset-0 z-0">
-              <img 
-                src={project.image} 
-                className={`project-image w-full h-full object-cover transition-all duration-700 ${
-                  isMobile 
-                    ? 'opacity-50 group-active:scale-105' 
-                    : `grayscale ${hoveredProject === project.id ? 'grayscale-0 scale-110 opacity-60' : 'opacity-40'}`
-                }`}
-                alt={project.title} 
-                loading="lazy"
-              />
-              <div className={`absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent transition-opacity duration-500 ${
-                isMobile && expandedProject === project.id ? 'opacity-100' : 'opacity-80'
-              }`}></div>
-            </div>
-
-            {/* Status Badge - Mobile Only */}
-            {isMobile && (
-              <div className="absolute top-3 right-3 z-20">
-                <div className={`px-2 py-0.5 rounded-full text-[6px] font-mono font-bold uppercase tracking-wider ${
-                  project.status === 'LIVE' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
-                  project.status === 'BETA' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' :
-                  'bg-gray-500/20 text-gray-400 border border-gray-500/30'
-                }`}>
-                  {project.status}
-                </div>
-              </div>
+          <ProjectCard
+            key={project.id}
+            project={project}
+            index={index}
+            isMobile={isMobile}
+            expandedProject={expandedProject}
+            onCardClick={handleCardClick}
+            gridClass={cn(
+              !isMobile && project.size === 'large' && 'sm:col-span-2 lg:col-span-2 lg:row-span-2',
+              !isMobile && project.size === 'medium' && 'lg:row-span-2',
+              !isMobile && project.size === 'small' && 'lg:row-span-1'
             )}
-
-            {/* Project Content */}
-            <div className={`relative z-10 p-4 md:p-6 h-full flex flex-col transition-all duration-500 ${
-              isMobile && expandedProject === project.id ? 'justify-start pt-12' : 'justify-end'
-            }`}>
-              <div className="flex justify-between items-start mb-2 flex-wrap gap-2">
-                <span className="font-mono text-cyber-blue text-[7px] md:text-[9px] tracking-widest uppercase bg-cyber-blue/10 px-2 py-0.5 border border-cyber-blue/20">
-                  {project.subtitle}
-                </span>
-                <span className="font-mono text-gray-500 text-[7px] md:text-[8px] tracking-widest hidden md:block">
-                  {project.date}
-                </span>
-                {isMobile && (
-                  <span className="font-mono text-gray-500 text-[6px] tracking-widest">
-                    {project.date}
-                  </span>
-                )}
-              </div>
-
-              <h3 className={`font-black mb-2 md:mb-3 tracking-tighter uppercase group-hover:text-cyber-blue transition-colors leading-tight
-                ${!isMobile && project.size === 'large' ? 'text-2xl md:text-5xl' : 'text-lg md:text-2xl'}
-                ${isMobile ? 'text-xl' : ''}
-              `}>
-                {project.title.split("_").join(" ")}
-              </h3>
-
-              {/* Description - Conditional rendering for mobile */}
-              {((!isMobile && project.size !== 'small') || (isMobile && expandedProject === project.id)) && (
-                <>
-                  <div className={`border-l-2 border-cyber-blue/30 pl-3 md:pl-4 mb-3 md:mb-4 transform transition-all duration-500 ${
-                    isMobile ? 'translate-x-0 opacity-100' : 'opacity-0 group-hover:opacity-100 translate-x-[-10px] group-hover:translate-x-0'
-                  }`}>
-                    <p className="text-gray-400 text-[9px] md:text-xs font-mono leading-relaxed uppercase tracking-wider line-clamp-3">
-                      {project.description}
-                    </p>
-                  </div>
-
-                  {/* Tech Stack - Mobile Only when expanded */}
-                  {isMobile && project.tech && (
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {project.tech.map((tech, i) => (
-                        <span key={i} className="text-[6px] font-mono px-1.5 py-0.5 bg-cyber-blue/10 border border-cyber-blue/20 text-cyber-blue/80 rounded">
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </>
-              )}
-
-              {/* Mobile Expand Indicator */}
-              {isMobile && expandedProject !== project.id && (
-                <div className="absolute bottom-4 right-4 text-cyber-blue/50">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              )}
-
-              <div className={`flex justify-between items-center pt-3 md:pt-4 border-t border-white/5 mt-2 transition-all duration-500 ${
-                isMobile && expandedProject === project.id ? 'mt-auto' : ''
-              }`}>
-                <a 
-                  href={project.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-mono text-[7px] md:text-[9px] text-white/50 hover:text-cyber-blue tracking-[0.2em] md:tracking-[0.3em] uppercase transition-all duration-300 hover:tracking-[0.4em]"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {isMobile ? '[ ACCESS ]' : '[ ACCESS_FILE ]'}
-                </a>
-                <div className="text-[7px] md:text-[8px] font-mono text-gray-600">
-                  #{project.id}
-                </div>
-              </div>
-            </div>
-
-            {/* Decorative Elements */}
-            <div className={`absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyber-blue to-transparent transition-transform duration-500 ${
-              isMobile ? (expandedProject === project.id ? 'translate-y-0' : '-translate-y-full') : '-translate-y-full group-hover:translate-y-0'
-            } z-20`}></div>
-            
-            <div className={`absolute top-0 right-0 w-6 h-6 md:w-8 md:h-8 border-t border-r border-white/10 transition-all duration-500 ${
-              !isMobile && hoveredProject === project.id ? 'border-cyber-blue/60 w-8 h-8' : ''
-            }`}></div>
-            <div className={`absolute bottom-0 left-0 w-6 h-6 md:w-8 md:h-8 border-b border-l border-white/10 transition-all duration-500 ${
-              !isMobile && hoveredProject === project.id ? 'border-cyber-blue/60 w-8 h-8' : ''
-            }`}></div>
-
-            {/* Glow Effect on Hover - Desktop */}
-            {!isMobile && hoveredProject === project.id && (
-              <div className="absolute inset-0 bg-gradient-to-t from-cyber-blue/5 via-transparent to-transparent pointer-events-none"></div>
-            )}
-          </div>
+          />
         ))}
       </div>
 
@@ -441,7 +287,7 @@ const Portfolio = () => {
           <button 
             className="group px-6 py-2 border border-cyber-blue/30 bg-cyber-blue/5 hover:bg-cyber-blue/10 transition-all duration-300 rounded-lg"
             onClick={() => {
-              const cards = document.querySelectorAll('.project-card');
+              const cards = document.querySelectorAll('.project-card-premium');
               const lastCard = cards[cards.length - 1];
               lastCard.scrollIntoView({ behavior: 'smooth', block: 'end' });
             }}

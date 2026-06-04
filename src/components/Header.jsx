@@ -1,140 +1,247 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { FaGithub, FaHome, FaMicrochip, FaUserShield, FaBars, FaTimes } from 'react-icons/fa';
-import { motion, AnimatePresence } from 'framer-motion';
+import {
+  FaGithub,
+  FaHome,
+  FaMicrochip,
+  FaCode,
+  FaEnvelope,
+  FaUserShield,
+} from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import { scrollToSection } from './providers/smooth-scroll';
+import { cn } from '../lib/utils';
+
+const navItems = [
+  { id: 'home', label: 'Home', icon: FaHome },
+  { id: 'skills', label: 'Stack', icon: FaCode },
+  { id: 'portfolio', label: 'Projects', icon: FaMicrochip },
+];
 
 const Header = () => {
-  const [isVisible, setIsVisible] = useState(true);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
-  const headerRef = useRef(null);
+  const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState('home');
+
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleScrollTo = (e, targetId) => {
-    if (e) e.preventDefault();
-    setIsMenuOpen(false);
-    
+  const allowHashScroll = useRef(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 32);
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    onScroll();
+
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    allowHashScroll.current = false;
+
+    const timer = setTimeout(() => {
+      allowHashScroll.current = true;
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (
+      location.pathname !== '/' ||
+      !location.hash ||
+      !allowHashScroll.current
+    )
+      return;
+
+    const hash = location.hash.replace('#', '');
+
+    if (!hash) return;
+
+    const timer = setTimeout(() => scrollToSection(hash), 200);
+
+    return () => clearTimeout(timer);
+  }, [location.hash, location.pathname]);
+
+  useEffect(() => {
+    // Hanya jalankan observer jika di halaman home
     if (location.pathname !== '/') {
-      navigate('/#' + targetId);
       return;
     }
 
-    const element = document.getElementById(targetId);
-    if (element) {
-      const offset = 0; 
-      const bodyRect = document.body.getBoundingClientRect().top;
-      const elementRect = element.getBoundingClientRect().top;
-      const elementPosition = elementRect - bodyRect;
-      const offsetPosition = elementPosition - offset;
+    const isMobile = window.innerWidth < 768;
 
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
+    const sections = navItems
+      .map((n) => document.getElementById(n.id))
+      .filter(Boolean);
+
+    if (sections.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      {
+        rootMargin: isMobile
+          ? '-15% 0px -65% 0px'
+          : '-35% 0px -55% 0px',
+        threshold: 0,
+      }
+    );
+
+    sections.forEach((s) => observer.observe(s));
+
+    return () => observer.disconnect();
+  }, [location.pathname]);
+
+  // Update active section berdasarkan path ketika tidak di home
+  useEffect(() => {
+    if (location.pathname !== '/') {
+      const path = location.pathname.replace('/', '');
+      
+      // Cek apakah path cocok dengan salah satu nav item
+      const matchingNav = navItems.find(item => item.id === path);
+      if (matchingNav) {
+        setActiveSection(matchingNav.id);
+      }
     }
+  }, [location.pathname]);
+
+  const go = (id, e) => {
+    if (e) e.preventDefault();
+
+    if (location.pathname !== '/') {
+      navigate(`/#${id}`);
+      return;
+    }
+
+    scrollToSection(id);
   };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(true);
-      }
-      setLastScrollY(currentScrollY);
-    };
+  const goHome = (e) => {
+    e.preventDefault();
 
-    if (!isMenuOpen) {
-      window.addEventListener('scroll', handleScroll);
+    if (location.pathname !== '/') {
+      navigate('/');
+      return;
     }
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY, isMenuOpen]);
 
-  const menuItems = [
-    { id: 'home', label: 'Home', icon: FaHome, to: '/', action: (e) => { e.preventDefault(); navigate('/'); window.scrollTo({ top: 0, behavior: 'smooth' }); } },
-    { id: 'portfolio', label: 'Projects', icon: FaMicrochip, to: '#portfolio', action: (e) => handleScrollTo(e, 'portfolio') },
-    { id: 'admin', label: 'Admin', icon: FaUserShield, to: '/admin-login', action: (e) => { e.preventDefault(); navigate('/admin-login'); } },
-    { id: 'github', label: 'GitHub', icon: FaGithub, to: 'https://github.com/chesko21', action: () => window.open('https://github.com/chesko21', '_blank') },
-  ];
+    scrollToSection('home');
+  };
 
   return (
     <>
-      {/* PC Header - Original Style */}
       <motion.header
-        ref={headerRef}
         initial={{ y: 0 }}
-        animate={{ y: isVisible ? 0 : -100 }}
-        transition={{ duration: 0.5, ease: "circOut" }}
-        className="fixed top-0 left-0 w-full z-50 px-8 py-6 flex justify-between items-center mix-blend-difference"
+        animate={{ y: 0 }}
+        className={cn(
+          'fixed top-0 left-0 z-50 flex w-full items-center justify-between px-5 py-4 transition-all duration-500 md:px-8 md:py-5',
+          scrolled ? 'nav-glass' : 'bg-transparent'
+        )}
       >
-        <Link to="/" className="group flex items-center space-x-4">
-          <img src="/chesko-logo.svg" alt="Logo" className="w-8 h-8 filter brightness-200 logo-glitch-effect transition-all" />
+        <Link
+          to="/"
+          onClick={goHome}
+          className="group flex items-center gap-3"
+        >
+          <img
+            src="/chesko-logo.svg"
+            alt="Logo"
+            className="h-8 w-8 brightness-200 transition-transform group-hover:scale-105"
+          />
+
           <div className="flex flex-col">
-            <span className="text-white font-black tracking-tighter text-xl leading-none uppercase">CHESKO</span>
-            <span className="text-white font-mono text-[8px] tracking-[0.4em] uppercase opacity-50 group-hover:opacity-100 transition-opacity">Portfolio_2026</span>
+            <span className="text-lg font-black uppercase leading-none tracking-tighter text-white">
+              CHESKO
+            </span>
+
+            <span className="font-mono text-[8px] uppercase tracking-[0.35em] text-cyber-blue/60 group-hover:text-cyber-blue">
+              Portfolio_2026
+            </span>
           </div>
         </Link>
 
-        {/* Desktop Nav - Visible only on MD and up */}
-        <nav className="hidden md:flex items-center space-x-12">
-          {menuItems.map((item) => (
-            item.id === 'portfolio' ? (
-              <a
-                key={item.id}
-                href={item.to}
-                onClick={item.action}
-                className="text-white font-mono text-[10px] uppercase tracking-[0.3em] hover:text-gray-400 transition-colors relative group"
-              >
-                {item.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-px bg-white transition-all duration-300 group-hover:w-full"></span>
-              </a>
-            ) : (
-              <Link
-                key={item.id}
-                to={item.to}
-                className="text-white font-mono text-[10px] uppercase tracking-[0.3em] hover:text-gray-400 transition-colors relative group"
-              >
-                {item.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-px bg-white transition-all duration-300 group-hover:w-full"></span>
-              </Link>
-            )
+        {/* Desktop Navigation */}
+        <nav className="hidden items-center gap-1 md:flex">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={(e) => go(item.id, e)}
+              className={cn(
+                'link-cyber relative px-4 py-2 transition-all duration-300',
+                activeSection === item.id
+                  ? 'text-cyber-blue'
+                  : 'text-white/70 hover:text-white'
+              )}
+            >
+              {item.label}
+
+              {activeSection === item.id && (
+                <motion.span
+                  layoutId="nav-active"
+                  className="absolute bottom-0 left-3 right-3 h-px bg-gradient-to-r from-cyber-blue to-cyber-purple"
+                />
+              )}
+            </button>
           ))}
+
+          <a
+            href="https://github.com/chesko21"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-3 rounded-lg border border-white/10 px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-white/60 transition-premium hover:border-cyber-blue/40 hover:text-cyber-blue"
+          >
+            GitHub
+          </a>
+
+          <Link
+            to="/admin-login"
+            className="ml-1 rounded-lg px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-white/30 transition-premium hover:text-white/60"
+          >
+            Admin
+          </Link>
         </nav>
       </motion.header>
 
-      {/* Mobile Bottom Navbar - Fixed at bottom */}
-      <div className="md:hidden fixed bottom-0 left-0 w-full z-[100] px-4 pb-6">
-        <div className="glassmorphism rounded-2xl border border-white/10 flex justify-around items-center py-4 px-2 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
-          {menuItems.map((item) => (
+      {/* Bottom Mobile Navigation */}
+      <div className="fixed bottom-0 left-0 z-[100] w-full border-t border-white/5 bg-black/80 px-2 py-2 backdrop-blur-xl md:hidden">
+        <div className="flex justify-around">
+          {navItems.map((item) => (
             <button
               key={item.id}
-              onClick={item.action}
-              className="flex flex-col items-center space-y-1 group"
+              type="button"
+              onClick={(e) => go(item.id, e)}
+              className={cn(
+                'flex min-h-[44px] flex-1 flex-col items-center justify-center gap-0.5 font-mono text-[8px] uppercase tracking-wider transition-all duration-300',
+                activeSection === item.id
+                  ? 'text-cyber-blue'
+                  : 'text-gray-500 hover:text-gray-300'
+              )}
             >
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-400 group-hover:text-cyber-primary group-hover:bg-cyber-primary/10 transition-all duration-300">
-                <item.icon size={20} />
-              </div>
-              <span className="text-[9px] font-mono uppercase tracking-widest text-gray-500 group-hover:text-cyber-primary transition-colors">
-                {item.label}
-              </span>
+              <item.icon size={18} />
+              {item.label}
             </button>
           ))}
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate('/admin-login');
+            }}
+            className="flex min-h-[44px] flex-1 flex-col items-center justify-center gap-0.5 font-mono text-[8px] uppercase text-gray-600 transition-all duration-300 hover:text-gray-400"
+          >
+            <FaUserShield size={18} />
+            Admin
+          </button>
         </div>
       </div>
-
-      {/* Mobile Background Blur Overlay */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="md:hidden fixed inset-0 z-[90] bg-black/40 backdrop-blur-sm pointer-events-none"
-          />
-        )}
-      </AnimatePresence>
     </>
   );
 };

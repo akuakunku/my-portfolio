@@ -1,0 +1,15 @@
+export const techStack = [
+  'Kotlin',
+  'TypeScript',
+  'JavaScript',
+  'React',
+  'Node.js',
+  'Vite',
+  'Tailwind CSS',
+  'Framer Motion',
+  'GSAP',
+  'Three.js',
+  'Supabase',
+  'tsParticles',
+  'Docker',
+];
